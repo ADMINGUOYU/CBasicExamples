@@ -129,6 +129,7 @@
   <ItemGroup>
     <ClCompile Include="assist.c" />
     <ClCompile Include="bufferedInput.c" />
+    <ClCompile Include="funcPointer.c" />
     <ClCompile Include="helloWorld.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="memoryAlloc.c" />
@@ -139,6 +140,7 @@
     <ClInclude Include="assist.h" />
     <ClInclude Include="bufferedInput.h" />
     <ClInclude Include="funcList.h" />
+    <ClInclude Include="funcPointer.h" />
     <ClInclude Include="helloWorld.h" />
     <ClInclude Include="memoryAlloc.h" />
     <ClInclude Include="recursion.h" />

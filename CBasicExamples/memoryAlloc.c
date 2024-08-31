@@ -28,13 +28,14 @@ int memAlloc(size_t size) {
 	void* ptr = malloc(size);
 	if (ptr == NULL) {
 		printf("%s\n", strerror(errno));
-		printf("Operation FAILED program will terminate.\n");
-		exit(EXIT_FAILURE);
+		printf("[Operation FAILED] program will terminate.\n");
+		return EXIT_FAILURE;
 	}
 	printf("Memory allocation complete, memory starts at: %p\n",ptr);
 	printf("Press [ENTER] to free memory >>");
 	while (getchar() != '\n') {}
 	free(ptr);
 	ptr = NULL;
-	printf("Operation COMPLETE program will terminate.\n");
+	printf("[Operation COMPLETE] program will terminate.\n");
+	return 0;
 }

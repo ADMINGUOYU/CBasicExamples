@@ -24,10 +24,11 @@ int main(int argc,char* argv[]) {
 		menu();
 		programChooser();
 		do {
+			printf("\n");
 			printf("-------------------------------< Function Execution Starts >\n");
 			FuncCALL;
-			printf("-------------------------------<Function Execution Completed>\n");
-			printf("\n<Repeat?> \n[ENTER] to continue\nPress any key to quit\n");
+			printf("-------------------------------<Function Execution Completes>\n");
+			printf("\n<Repeat?> \n[ENTER] to repeat\nPress any key to quit\n");
 		} while (getchar() == '\n');
 
 		while(getchar() != '\n'){}
@@ -50,9 +51,11 @@ int menu(void) {
 	printf("\n");
 	
 	printf("Here is the DEMO program list >>\n");
+	printf("\n");
 	for (int i = 0; i < ProgramCount; i++) {
-		printf("%d: %s\n", i, programList[i]);
+		printf("%-3d: %s\n", i, programList[i]);
 	}
+	printf("\n");
 	printf("--> %d program(s) in total\n", ProgramCount);
 	printf("\n");
 

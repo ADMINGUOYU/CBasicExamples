@@ -1,5 +1,7 @@
 #include "simpleCalculation.h"
 
+double calculator(double num1, double num2, char operation);
+
 int calculatorMain(int argc, char* argv[]) {
     char operation;
     double num1, num2;

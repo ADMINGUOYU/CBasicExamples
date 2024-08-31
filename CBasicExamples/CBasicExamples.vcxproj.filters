@@ -36,6 +36,9 @@
     <ClCompile Include="simpleCalculation.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="funcPointer.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="recursion.h">
@@ -57,6 +60,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="simpleCalculation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="funcPointer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -4,7 +4,8 @@
 #include "memoryAlloc.h"
 #include "bufferedInput.h"
 #include "simpleCalculation.h"
+#include "funcPointer.h"
 
-#define ProgramCount 5
-char* programList[] = {"Hello World", "recursion","memory allocation","buffered input","simple calculator"};
-void* programFunc[] = { helloWorldMain,recursionMain,memAllocMain,bufferedInputMain,calculatorMain};
+#define ProgramCount 6
+char* programList[] = {"Hello World", "recursion","memory allocation","buffered input","simple calculator","function pointer"};
+void* programFunc[] = { helloWorldMain,recursionMain,memAllocMain,bufferedInputMain,calculatorMain,funcPointerMain};

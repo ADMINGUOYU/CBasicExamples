@@ -1,5 +1,7 @@
 #include "bufferedInput.h"
 
+int echo(void);
+
 int bufferedInputMain(int argc, char* argv[]) {
 	echo();
 	return 0;
