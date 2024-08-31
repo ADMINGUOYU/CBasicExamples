@@ -16,7 +16,7 @@ int memAllocMain(int argc, char* argv[]) {
 		printf("Please enter size to allocate >> ");
 		size = get_size_t();
 	}
-	while (getchar() != '\n') {}
+	//while (getchar() != '\n') {}
 	printf("Program will allocate %zd byte(s) of memory\nPress [ENTER] to continue >>\n", size);
 	while (getchar() != '\n') {}
 	memAlloc(size);
@@ -28,7 +28,7 @@ int memAlloc(size_t size) {
 	void* ptr = malloc(size);
 	if (ptr == NULL) {
 		printf("%s\n", strerror(errno));
-		printf("Operation FAILED program will terminate.");
+		printf("Operation FAILED program will terminate.\n");
 		exit(EXIT_FAILURE);
 	}
 	printf("Memory allocation complete, memory starts at: %p\n",ptr);
@@ -36,5 +36,5 @@ int memAlloc(size_t size) {
 	while (getchar() != '\n') {}
 	free(ptr);
 	ptr = NULL;
-	printf("Operation COMPLETE program will terminate.");
+	printf("Operation COMPLETE program will terminate.\n");
 }

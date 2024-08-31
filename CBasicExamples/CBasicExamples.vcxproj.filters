@@ -30,6 +30,12 @@
     <ClCompile Include="helloWorld.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="bufferedInput.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="simpleCalculation.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="recursion.h">
@@ -45,6 +51,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="helloWorld.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bufferedInput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleCalculation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

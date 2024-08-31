@@ -128,17 +128,21 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="assist.c" />
+    <ClCompile Include="bufferedInput.c" />
     <ClCompile Include="helloWorld.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="memoryAlloc.c" />
     <ClCompile Include="recursion.c" />
+    <ClCompile Include="simpleCalculation.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="assist.h" />
+    <ClInclude Include="bufferedInput.h" />
     <ClInclude Include="funcList.h" />
     <ClInclude Include="helloWorld.h" />
     <ClInclude Include="memoryAlloc.h" />
     <ClInclude Include="recursion.h" />
+    <ClInclude Include="simpleCalculation.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

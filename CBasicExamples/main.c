@@ -23,9 +23,16 @@ int main(int argc,char* argv[]) {
 	while (go) {
 		menu();
 		programChooser();
-		FuncCALL;
+		do {
+			printf("-------------------------------< Function Execution Starts >\n");
+			FuncCALL;
+			printf("-------------------------------<Function Execution Completed>\n");
+			printf("\n<Repeat?> \n[ENTER] to continue\nPress any key to quit\n");
+		} while (getchar() == '\n');
 
-		printf("Continue? \n[ENTER] to continue\nPress any key to quit\n");
+		while(getchar() != '\n'){}
+
+		printf("\n<Continue?> \n[ENTER] to continue\nPress any key to quit\n");
 		if (getchar() != '\n') {
 			go = 0;
 		}

@@ -1,3 +1,2 @@
-﻿  recursion.c
-C:\Users\GUOYU\source\repos\CBasicExamples\CBasicExamples\recursion.c(17,18): warning C4047: '=': 'int' differs in levels of indirection from 'char *'
+﻿  simpleCalculation.c
   CBasicExamples.vcxproj -> C:\Users\GUOYU\source\repos\CBasicExamples\x64\Debug\CBasicExamples.exe
