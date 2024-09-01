@@ -130,6 +130,7 @@
     <ClCompile Include="assist.c" />
     <ClCompile Include="bufferedInput.c" />
     <ClCompile Include="fileIO.c" />
+    <ClCompile Include="forLoopC99.c" />
     <ClCompile Include="funcPointer.c" />
     <ClCompile Include="helloWorld.c" />
     <ClCompile Include="main.c" />
@@ -141,6 +142,7 @@
     <ClInclude Include="assist.h" />
     <ClInclude Include="bufferedInput.h" />
     <ClInclude Include="fileIO.h" />
+    <ClInclude Include="forLoopC99.h" />
     <ClInclude Include="funcList.h" />
     <ClInclude Include="funcPointer.h" />
     <ClInclude Include="helloWorld.h" />

@@ -37,8 +37,9 @@ int recursionMain(int argc, char* argv[]) {
 void up_and_down(int n)
 {
 	i++;
-	printf("Level %3d: variable location %p\n", i, &n); /* 1 */
+	int number = i;
+	printf("Level %3d: variable location %p\n", number, &n); /* 1 */
 	if (i < n)
 		up_and_down(n);
-	printf("LEVEL %3d: variable location %p\n", i, &n); /* 2 */
+	printf("LEVEL %3d: variable location %p\n", number, &n); /* 2 */
 }

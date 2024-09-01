@@ -42,6 +42,9 @@
     <ClCompile Include="fileIO.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="forLoopC99.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="recursion.h">
@@ -69,6 +72,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="fileIO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="forLoopC99.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

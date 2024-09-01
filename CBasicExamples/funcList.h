@@ -6,7 +6,8 @@
 #include "simpleCalculation.h"
 #include "funcPointer.h"
 #include "fileIO.h"
+#include "forLoopC99.h"
 
-#define ProgramCount 7
-char* programList[] = {"Hello World", "recursion","memory allocation","buffered input","simple calculator","function pointer","file I/O"};
-void* programFunc[] = {helloWorldMain, recursionMain, memAllocMain, bufferedInputMain, calculatorMain, funcPointerMain, fileIOMain};
+#define ProgramCount 8
+char* programList[] = {"Hello World", "recursion","memory allocation","buffered input","simple calculator","function pointer","file I/O","for loop scope C99 DEMO"};
+void* programFunc[] = {helloWorldMain, recursionMain, memAllocMain, bufferedInputMain, calculatorMain, funcPointerMain, fileIOMain, forLoopC99Main};
