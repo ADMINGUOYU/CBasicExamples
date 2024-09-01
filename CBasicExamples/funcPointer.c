@@ -1,4 +1,7 @@
+#define _CRT_SECURE_NO_WARNINGS 1
 #include "funcPointer.h"
+#include <stdio.h>
+#include <ctype.h>
 #define MAX 100
 
 void (*ptrFUNC) (char*);

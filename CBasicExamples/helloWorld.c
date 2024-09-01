@@ -1,4 +1,5 @@
 #include "helloWorld.h"
+#include <stdio.h>
 
 int helloWorldMain(int argc, char* argv[]) {
 	printf("This is %s\n", argv[0]);

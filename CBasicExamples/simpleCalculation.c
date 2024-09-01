@@ -1,4 +1,8 @@
+#define _CRT_SECURE_NO_WARNINGS 1
 #include "simpleCalculation.h"
+#include <stdio.h>
+#include <limits.h>
+#include "assist.h"
 
 double calculator(double num1, double num2, char operation);
 

@@ -1,4 +1,10 @@
+#define _CRT_SECURE_NO_WARNINGS 1
 #include "memoryAlloc.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "assist.h"
 
 extern int get_int(void);
 extern int inputNUMRange(int min, int max);

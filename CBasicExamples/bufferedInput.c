@@ -1,4 +1,5 @@
 #include "bufferedInput.h"
+#include <stdio.h>
 
 int echo(void);
 
