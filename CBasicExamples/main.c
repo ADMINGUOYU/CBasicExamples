@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 //Include header files
-#include "assist.h"
+#include "assist_IO.h"
 //Include DEMO functions
 #include "funcList.h"
 //Define MACROS

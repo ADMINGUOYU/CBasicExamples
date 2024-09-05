@@ -1,3 +1,4 @@
-﻿  recursion.c
-C:\Users\GUOYU\source\repos\CBasicExamples\CBasicExamples\recursion.c(23,18): warning C4047: '=': 'int' differs in levels of indirection from 'char *'
+﻿  memoryAlloc.c
+C:\Users\GUOYU\source\repos\CBasicExamples\CBasicExamples\memoryAlloc.c(77,32): warning C4267: 'function': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\GUOYU\source\repos\CBasicExamples\CBasicExamples\memoryAlloc.c(95,8): warning C4553: '==': result of expression not used; did you intend '='?
   CBasicExamples.vcxproj -> C:\Users\GUOYU\source\repos\CBasicExamples\x64\Debug\CBasicExamples.exe

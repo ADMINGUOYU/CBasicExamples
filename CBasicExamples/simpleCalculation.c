@@ -2,7 +2,7 @@
 #include "simpleCalculation.h"
 #include <stdio.h>
 #include <limits.h>
-#include "assist.h"
+#include "assist_IO.h"
 
 double calculator(double num1, double num2, char operation);
 

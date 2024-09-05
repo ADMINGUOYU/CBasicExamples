@@ -21,7 +21,7 @@
     <ClCompile Include="recursion.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="assist.c">
+    <ClCompile Include="assist_IO.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="memoryAlloc.c">
@@ -45,12 +45,15 @@
     <ClCompile Include="forLoopC99.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="assist_FileIO.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="recursion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="assist.h">
+    <ClInclude Include="assist_IO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="memoryAlloc.h">
@@ -75,6 +78,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="forLoopC99.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="assist_FileIO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

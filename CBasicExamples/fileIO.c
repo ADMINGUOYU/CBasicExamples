@@ -49,10 +49,20 @@ int fileReverse(void)
 {
     char file[SLEN];
     char ch;
-    FILE* fp;
+    FILE* ofp = NULL, * fp;
     long count, last;
+    int outFlag = 0;
 
     printf("**This program will print the given file's characters in a reversed order**\n\n");
+    
+    printf("Would you like to save a copy? (y/n) >> ");
+    if (getchar() == 'y') { 
+        printf(">> Find output.txt in the same directory as executable <<\n");
+        ofp = fopen("output.txt", "w+");
+        outFlag = 1; 
+    }
+    while (getchar() != '\n'){}
+    
     puts("Enter the name of the file to be processed:");
     scanf("%80s", file);
     if ((fp = fopen(file, "rb")) == NULL)
@@ -73,8 +83,10 @@ int fileReverse(void)
     {
         fseek(fp, -count, SEEK_END); /* go backward      */
         ch = getc(fp);
-        if (ch != CNTL_Z && ch != '\r')  /* MS-DOS files */
+        if (ch != CNTL_Z && ch != '\r') { /* MS-DOS files */
             putchar(ch);
+            if (outFlag) { fprintf(ofp,"%c",ch); }
+        }  
     }
     putchar('\n');
     putchar('\n');

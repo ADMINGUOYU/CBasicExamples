@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "assist.h"
+#include "assist_IO.h"
 
 extern int get_int(void);
 extern int inputNUMRange(int min, int max);

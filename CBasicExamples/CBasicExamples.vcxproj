@@ -127,7 +127,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="assist.c" />
+    <ClCompile Include="assist_FileIO.c" />
+    <ClCompile Include="assist_IO.c" />
     <ClCompile Include="bufferedInput.c" />
     <ClCompile Include="fileIO.c" />
     <ClCompile Include="forLoopC99.c" />
@@ -139,7 +140,8 @@
     <ClCompile Include="simpleCalculation.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="assist.h" />
+    <ClInclude Include="assist_FileIO.h" />
+    <ClInclude Include="assist_IO.h" />
     <ClInclude Include="bufferedInput.h" />
     <ClInclude Include="fileIO.h" />
     <ClInclude Include="forLoopC99.h" />
