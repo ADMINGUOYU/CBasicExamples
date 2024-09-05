@@ -1,6 +1,6 @@
-#C Basic Examples
-###Shows some basic C Language methods.
-##Function List:
+# C Basic Examples
+### Shows some basic C Language methods.
+## Function List:
 ```
 0  : Hello World -> testing Prints "Hello World"
 1  : recursion
