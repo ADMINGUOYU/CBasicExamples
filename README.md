@@ -1,6 +1,6 @@
 Shows some basic C Language methods.
 
-<Function List>
+Function List:
 
 0  : Hello World -> testing Prints "Hello World"
 
