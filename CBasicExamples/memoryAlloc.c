@@ -13,6 +13,7 @@ extern int inputNUMRange(int min, int max);
 extern size_t get_size_t(void);
 
 void* memAlloc(size_t size);
+int memInit(void* ptr, size_t size);
 int memFree(void* ptr);
 int memPrint(void* ptr, size_t size);
 int memWrite(void* ptr, int pos, size_t size, char* content, int count);
@@ -50,10 +51,20 @@ int memAllocMain(int argc, char* argv[]) {
 	}
 
 	while (1) {
-		printf("Select operation >>\np) Print memory\nw) Write memory\nf) Free memory and quit\n\n");
+		printf("Select operation >>\ni) Initialize memory\np) Print memory\nw) Write memory\nf) Free memory and quit\n\n");
 
 		switch (getchar())
 		{
+		case 'i':
+			//Get excessive '\n' in input buffer
+			while (getchar() != '\n') {}
+
+			//init mem (using function 'memInit')
+			memInit(ptr, size);
+
+			//Just for BETTER looking
+			putchar('\n');
+			break;
 		case 'p':
 			//Get excessive '\n' in input buffer
 			while (getchar() != '\n') {}
@@ -90,6 +101,9 @@ int memAllocMain(int argc, char* argv[]) {
 			break;
 		case'f':	//Using C switch pitfall mechanism
 		default:
+			//Get excessive '\n' in input buffer
+			while (getchar() != '\n') {}
+
 			//Free memory
 			memFree(ptr);
 			ptr == NULL;
@@ -117,15 +131,38 @@ void* memAlloc(size_t size) {
 	return ptr;
 }
 
+//Definition of funtion "memInit"
+int memInit(void* ptr, size_t size) {
+	char* cptr = (char*)ptr;
+	
+	//Error checking
+	if (ptr == NULL) {
+		printf("ERROR: NULL pointer.\n");
+		return -1;
+	}
+
+	for (int i = 0; i < size; i++) {
+		cptr[i] = ' ';
+	}
+
+	printf("Done.\n");
+
+	return 0;
+}
+
 //Definition of funtion "memFree" -> frees allocated memory blocks
 int memFree(void* ptr) {
+	//Error checking
 	if (ptr == NULL) {
 		printf("ERROR: NULL pointer.\n");
 		return -1;
 	}
 	printf("Press [ENTER] to free memory >>");
 	while (getchar() != '\n') {}
+
+	//Free memory (using standard library function)
 	free(ptr);
+
 	printf("[Operation COMPLETE] program will terminate.\n");
 	return 0;
 }
