@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 
 #include "assist_IO.h"
 
@@ -46,7 +47,7 @@ int memAllocMain(int argc, char* argv[]) {
 	//Error checking
 	if (ptr == NULL) { return -1; }
 	if (writePtr == NULL) {
-		printf("ERROR: can't write!\n"); 
+		fprintf(stderr, "ERROR: can't write!\n"); 
 		writeEnabled = 0;
 	}
 
@@ -80,7 +81,7 @@ int memAllocMain(int argc, char* argv[]) {
 			while (getchar() != '\n') {}
 
 			//Check if buffer to read keyboard input is ready
-			if (writeEnabled == 0) { printf("ERROR: can't write!\n"); break; }
+			if (writeEnabled == 0) { fprintf(stderr, "ERROR: can't write!\n"); break; }
 
 			//Get memory write start location (pointer offset)
 			int pos;
@@ -90,10 +91,19 @@ int memAllocMain(int argc, char* argv[]) {
 			//Get input from keyboard
 			int count = 0;
 			printf("INPUT >> ");
-			while ((writePtr[count] = getchar()) != '\n' && count < size) { count++; }	//Just ignore warnings 'C6054' and 'C6386'
-			writePtr[count] = '\0';
-			printf("Press [ENTER] again to finish input.\n");
-			while (getchar() != '\n') {}
+			for (int i = 0; i < size; i++) {
+				if ((writePtr[i] = getchar()) != '\n') {
+					if ((i == (size - 1)) && (getchar() != '\n')) {
+						fprintf(stderr, "WARNING: input buffer overflow >> character(s) after %c will be truncated!\n", writePtr[i]);
+						while (getchar() != '\n') {}
+					}
+					count++;
+					continue;
+				}
+				else {
+					break;
+				}
+			}
 
 			//Write input to memory (using function "memWrite")
 			if (memWrite(ptr, pos, size, writePtr, count) == 0) { printf("Done.\n"); }
@@ -123,8 +133,8 @@ int memAllocMain(int argc, char* argv[]) {
 void* memAlloc(size_t size) {
 	void* ptr = malloc(size);
 	if (ptr == NULL) {
-		printf("%s\n", strerror(errno));
-		printf("[Operation FAILED] program will terminate.\n");
+		fprintf(stderr, "%s\n", strerror(errno));
+		fprintf(stderr, "[Operation FAILED] program will terminate.\n");
 		return NULL;
 	}
 	printf("Memory allocation complete, memory starts at: %p\n",ptr);
@@ -137,7 +147,7 @@ int memInit(void* ptr, size_t size) {
 	
 	//Error checking
 	if (ptr == NULL) {
-		printf("ERROR: NULL pointer.\n");
+		fprintf(stderr, "ERROR: NULL pointer.\n");
 		return -1;
 	}
 
@@ -154,7 +164,7 @@ int memInit(void* ptr, size_t size) {
 int memFree(void* ptr) {
 	//Error checking
 	if (ptr == NULL) {
-		printf("ERROR: NULL pointer.\n");
+		fprintf(stderr, "ERROR: NULL pointer.\n");
 		return -1;
 	}
 	printf("Press [ENTER] to free memory >>");
@@ -173,7 +183,7 @@ int memPrint(void* ptr,size_t size) {
 	
 	//Error checking
 	if (ptr == NULL) {
-		printf("ERROR: NULL pointer.\n");
+		fprintf(stderr, "ERROR: NULL pointer.\n");
 		return -1;
 	}
 
@@ -210,15 +220,15 @@ int memPrint(void* ptr,size_t size) {
 
 int memWrite(void* ptr, int pos, size_t size, char* content,int count) {
 	char* cptr = (char*)ptr;
+	int writtenNum = (count <= (size - pos)) ? count : (size - pos);
 
 	//Error checking
-	if (count > (size - pos)) {
-		printf("ERROR: not enough space to write content.\n");
-		return -1;
+	if (writtenNum != count) {
+		fprintf(stderr, "WARNING: overflow >> character(s) after %c will be truncated!\n", content[writtenNum - 1]);
 	}
 
 	//Start writing
-	for (int i = 0; i < count; i++) {
+	for (int i = 0; i < writtenNum; i++) {
 		cptr[pos + i] = content[i];
 	}
 

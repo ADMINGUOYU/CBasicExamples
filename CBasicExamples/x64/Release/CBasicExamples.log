@@ -1,8 +1,10 @@
-﻿  enumeration.c
-  main.c
+﻿  memoryAlloc.c
+C:\Users\GUOYU\source\repos\CBasicExamples\CBasicExamples\memoryAlloc.c(89,32): warning C4267: 'function': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\GUOYU\source\repos\CBasicExamples\CBasicExamples\memoryAlloc.c(119,8): warning C4553: '==': result of expression not used; did you intend '='?
+C:\Users\GUOYU\source\repos\CBasicExamples\CBasicExamples\memoryAlloc.c(223,43): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
   Generating code
-  4 of 34 functions (11.8%) were compiled, the rest were copied from previous compilation.
-    1 functions were new in current compilation
-    17 functions had inline decision re-evaluated but remain unchanged
+  7 of 34 functions (20.6%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    15 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   CBasicExamples.vcxproj -> C:\Users\GUOYU\source\repos\CBasicExamples\x64\Release\CBasicExamples.exe
