@@ -3,9 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 //Include header files
-#include "assist_IO.h"
+#include "./CBasicExamples/assist_IO.h"
 //Include DEMO functions
-#include "funcList.h"
+#include "./CBasicExamples/funcList.h"
 //Define MACROS
 #define FuncCALL (*myFunc)(argc, argv)
 #define FuncDef(X) myFunc = X
@@ -69,5 +69,5 @@ void programChooser(void) {
 	int select;
 	printf("Please select: ");
 	select = inputNUMRange(0, ProgramCount - 1);
-	FuncDef(programFunc[select]);
+	FuncDef((int (*)(int, char**))programFunc[select]);
 }

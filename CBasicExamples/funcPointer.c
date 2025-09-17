@@ -1,4 +1,3 @@
-#define _CRT_SECURE_NO_WARNINGS 1
 #include "funcPointer.h"
 #include <stdio.h>
 #include <ctype.h>
@@ -16,7 +15,7 @@ int funcPointerMain(int argc, char* argv[])
 
     puts("This program uses a function pointer to execute designated method");
     puts("Please input a string >>");
-    gets(buff);
+    fgets(buff, MAX, stdin);
 
     puts("Please specify an action: \n[U] --> to UPPER\n[l] --> to lower\n[Other Key] --> do nothing\n>> ");
     scanf("%c", &option);
@@ -46,7 +45,7 @@ void ToUpper(char* tmp)
 {
     int i;
     puts("We are converting your input to UPPER case...");
-    for (i = 0; i < MAX, tmp[i] != '\0'; i++)
+    for (i = 0; (i < MAX) && (tmp[i] != '\0'); i++)
     {
         tmp[i] = toupper(tmp[i]);
     }
@@ -56,7 +55,7 @@ void ToLower(char* tmp)
 {
     int i;
     puts("We are converting your input to lower case...");
-    for (i = 0; i < MAX, tmp[i] != '\0'; i++)
+    for (i = 0; (i < MAX) && (tmp[i] != '\0'); i++)
     {
         tmp[i] = tolower(tmp[i]);
     }

@@ -1,4 +1,3 @@
-#define _CRT_SECURE_NO_WARNINGS 1
 #include "memoryAlloc.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -116,7 +115,7 @@ int memAllocMain(int argc, char* argv[]) {
 
 			//Free memory
 			memFree(ptr);
-			ptr == NULL;
+			ptr = NULL;
 
 			//Free input buffer
 			if (writePtr != NULL) {

@@ -1,4 +1,3 @@
-#define _CRT_SECURE_NO_WARNINGS 1
 #include "recursion.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,7 +19,7 @@ int recursionMain(int argc, char* argv[]) {
 
 	int recursionTimes = 0;
 	if (argc > 1) {
-		recursionTimes = argv[1];
+		recursionTimes = atoi(argv[1]);
 	}
 	printf("Here shows an example of Recursion\n");
 	if (recursionTimes == 0) {
