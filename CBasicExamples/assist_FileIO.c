@@ -1,4 +1,7 @@
 #include "assist_FileIO.h"
+#include <stdio.h>
+#include <string.h>
+#define MAX_NAME_LENGTH 90
 
 typedef struct fileIO {
 	FILE* fptr;

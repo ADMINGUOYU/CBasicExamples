@@ -15,7 +15,7 @@ int funcPointerMain(int argc, char* argv[])
 
     puts("This program uses a function pointer to execute designated method");
     puts("Please input a string >>");
-    fgets(buff, MAX, stdin);
+    gets(buff);
 
     puts("Please specify an action: \n[U] --> to UPPER\n[l] --> to lower\n[Other Key] --> do nothing\n>> ");
     scanf("%c", &option);

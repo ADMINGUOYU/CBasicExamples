@@ -10,8 +10,9 @@
 #include "fileIO.h"
 #include "forLoopC99.h"
 #include "enumeration.h"
+#include "large_uint_mul.h"
 
-#define ProgramCount 9
+#define ProgramCount 10
 char* programList[] = {
     "Hello World", 
     "recursion",
@@ -21,7 +22,9 @@ char* programList[] = {
     "function pointer",
     "file I/O",
     "for loop scope C99 DEMO",
-    "enumeration"};
+    "enumeration",
+    "large number(uint) multiplication"
+};
 void* programFunc[] = {
     (void*)helloWorldMain, 
     (void*)recursionMain, 
@@ -31,6 +34,8 @@ void* programFunc[] = {
     (void*)funcPointerMain, 
     (void*)fileIOMain, 
     (void*)forLoopC99Main, 
-    (void*)enumerationMain};
+    (void*)enumerationMain,
+    (void*)large_uint_mul_main
+};
 
 #endif
