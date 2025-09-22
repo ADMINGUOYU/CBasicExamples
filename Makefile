@@ -20,7 +20,7 @@ c_basic_examples: $(OBJS)
 
 -include $(DEPS)
 
-%.o: %.cpp
+%.o: %.c
 	$(CC) -MMD -MP -c -o $@ $< $(CFLAGS)
 
 clean:
