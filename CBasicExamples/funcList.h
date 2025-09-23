@@ -25,17 +25,17 @@ char* programList[] = {
     "enumeration",
     "large number(uint) multiplication"
 };
-void* programFunc[] = {
-    (void*)helloWorldMain, 
-    (void*)recursionMain, 
-    (void*)memAllocMain, 
-    (void*)bufferedInputMain, 
-    (void*)calculatorMain, 
-    (void*)funcPointerMain, 
-    (void*)fileIOMain, 
-    (void*)forLoopC99Main, 
-    (void*)enumerationMain,
-    (void*)large_uint_mul_main
+int (*programFunc[])(int argc, char** argv) = {
+    helloWorldMain, 
+    recursionMain, 
+    memAllocMain, 
+    bufferedInputMain, 
+    calculatorMain, 
+    funcPointerMain, 
+    fileIOMain, 
+    forLoopC99Main, 
+    enumerationMain,
+    large_uint_mul_main
 };
 
 #endif

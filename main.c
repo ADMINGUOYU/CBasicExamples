@@ -69,5 +69,5 @@ void programChooser(void) {
 	int select;
 	printf("Please select: ");
 	select = inputNUMRange(0, ProgramCount - 1);
-	FuncDef((int (*)(int, char**))programFunc[select]);
+	FuncDef(programFunc[select]);
 }

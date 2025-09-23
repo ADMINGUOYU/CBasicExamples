@@ -29,7 +29,7 @@ int fileClose(fileIO* file) {
 		return -1;
 	}
 	fclose(file->fptr);
-	file->fptr == NULL;
+	file->fptr = NULL;
 	return 0;
 }
 
