@@ -29,6 +29,17 @@ int large_uint_mul_main(int argc, char *argv[])
     // fetch input from stdin
     gets(multiplier);
 
+    // check if either is empty
+    if ((multiplicand[0] == '\0') || (multiplier[0] == '\0'))
+    {
+        // print message
+        printf("Either multiplicand or multiplier is empty, try again next time!\n");
+        // tidy-up
+        free(multiplicand);
+        free(multiplier);
+        return 0;
+    }
+
     // confirm inputs
     printf("-> Now we'll calculate %s * %s\n", multiplicand, multiplier);
 
