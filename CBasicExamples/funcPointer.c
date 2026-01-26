@@ -1,6 +1,7 @@
 #include "funcPointer.h"
 #include <stdio.h>
 #include <ctype.h>
+#include <string.h> // use of strcspn()
 #define MAX 100
 
 void (*ptrFUNC) (char*);
@@ -15,7 +16,14 @@ int funcPointerMain(int argc, char* argv[])
 
     puts("This program uses a function pointer to execute designated method");
     puts("Please input a string >>");
-    gets(buff);
+
+    // safer to use fgets()
+    if (fgets(buff, sizeof(buff), stdin) != NULL) {
+        // Find '\n' and replace it with '\0'
+        buff[strcspn(buff, "\n")] = '\0';
+    }
+    // danger to use gets() -> but gets() is CLASSIC
+    // gets(buff);
 
     puts("Please specify an action: \n[U] --> to UPPER\n[l] --> to lower\n[Other Key] --> do nothing\n>> ");
     scanf("%c", &option);

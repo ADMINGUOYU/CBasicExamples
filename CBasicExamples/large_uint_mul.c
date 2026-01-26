@@ -2,11 +2,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h> // use of strcspn()
 
 #define MAX_INPUT_BUFFER_SIZE 100
 
 // forward declaration
 char* large_uint_mul(const char* multiplicand, const char* multiplier);
+void get_input_safe(char* buff);
 
 // main function
 int large_uint_mul_main(int argc, char *argv[])
@@ -23,11 +25,11 @@ int large_uint_mul_main(int argc, char *argv[])
     // ask user for input
     printf("Please input <multiplicand>: \n>> ");
     // fetch input from stdin
-    gets(multiplicand);
+    get_input_safe(multiplicand);
     // ask user for input
     printf("Please input <multiplier>: \n>> ");
     // fetch input from stdin
-    gets(multiplier);
+    get_input_safe(multiplier);
 
     // check if either is empty
     if ((multiplicand[0] == '\0') || (multiplier[0] == '\0'))
@@ -143,4 +145,12 @@ char* large_uint_mul(const char* multiplicand, const char* multiplier)
     free(multiplicand_buff);
     // return
     return ret_buff;
+}
+
+void get_input_safe(char* buff)
+{
+    if (fgets(buff, MAX_INPUT_BUFFER_SIZE, stdin) != NULL) {
+        // Find '\n' and replace it with '\0'
+        buff[strcspn(buff, "\n")] = '\0';
+    }
 }

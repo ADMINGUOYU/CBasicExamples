@@ -28,6 +28,11 @@ int recursionMain(int argc, char* argv[]) {
 	}
 	printf("Set to %d time(s)\nPress [ENTER] to start >>\n", recursionTimes);
 	while(getchar() != '\n') {}
+
+	// Reset global variable
+	i = 0;
+
+	// Start recursion
 	up_and_down(recursionTimes);
 
 	return 0;
