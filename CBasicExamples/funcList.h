@@ -11,8 +11,9 @@
 #include "forLoopC99.h"
 #include "enumeration.h"
 #include "large_uint_mul.h"
+#include "array_demo.h"
 
-#define ProgramCount 10
+#define ProgramCount 11
 char* programList[] = {
     "Hello World", 
     "recursion",
@@ -23,7 +24,8 @@ char* programList[] = {
     "file I/O",
     "for loop scope C99 DEMO",
     "enumeration",
-    "large number(uint) multiplication"
+    "large number(uint) multiplication",
+    "array demonstration"
 };
 int (*programFunc[])(int argc, char** argv) = {
     helloWorldMain, 
@@ -35,7 +37,8 @@ int (*programFunc[])(int argc, char** argv) = {
     fileIOMain, 
     forLoopC99Main, 
     enumerationMain,
-    large_uint_mul_main
+    large_uint_mul_main,
+    array_demo_main
 };
 
 #endif
