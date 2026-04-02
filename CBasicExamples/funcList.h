@@ -13,7 +13,11 @@
 #include "large_uint_mul.h"
 #include "array_demo.h"
 
-#define ProgramCount 11
+// Algorithm
+#include "Algorithm/Dynamic-Programming/rod_cutting.h"
+#include "Algorithm/Dynamic-Programming/minimum_number_of_coins.h"
+#include "Algorithm/Dynamic-Programming/weighted_interval_scheduling.h"
+
 char* programList[] = {
     "Hello World", 
     "recursion",
@@ -25,7 +29,10 @@ char* programList[] = {
     "for loop scope C99 DEMO",
     "enumeration",
     "large number(uint) multiplication",
-    "array demonstration"
+    "array demonstration",
+    "Algorithm: Dynamic Programming - Rod Cutting Problem",
+    "Algorithm: Dynamic Programming - Minimum Number of Coins",
+    "Algorithm: Dynamic Programming - Weighted Interval Scheduling"
 };
 int (*programFunc[])(int argc, char** argv) = {
     helloWorldMain, 
@@ -38,7 +45,13 @@ int (*programFunc[])(int argc, char** argv) = {
     forLoopC99Main, 
     enumerationMain,
     large_uint_mul_main,
-    array_demo_main
+    array_demo_main,
+    alg_dp_rod_cutting_main,
+    alg_dp_minimum_number_of_coins_main,
+    alg_dp_weighted_interval_scheduling_main
 };
+
+// Define the program count
+#define ProgramCount (sizeof(programList) / sizeof(programList[0]))
 
 #endif

@@ -1,8 +1,14 @@
 CC = gcc
 CFLAGS = -std=c99 -g -Wall
 SRCDIR = ./CBasicExamples
+# Collect all .c files in the source directory and its subdirectories
 SRCS = main.c $(wildcard $(SRCDIR)/*.c)
+# Add source files from subdirectories
+SRCS += $(wildcard $(SRCDIR)/*/*.c)
+SRCS += $(wildcard $(SRCDIR)/*/*/*.c)
+# Generate object files and dependency files from source files
 OBJS = $(SRCS:.c=.o)
+# Generate dependency files from source files
 DEPS = $(SRCS:.c=.d)
 
 ifneq ($(OS), Windows_NT)
@@ -24,4 +30,4 @@ c_basic_examples: $(OBJS)
 	$(CC) -MMD -MP -c -o $@ $< $(CFLAGS)
 
 clean:
-	$(RM) -f *.o *.d ./CBasicExamples/*.o ./CBasicExamples/*.d c_basic_examples c_basic_examples.exe
+	$(RM) $(OBJS) $(DEPS) c_basic_examples

@@ -58,7 +58,7 @@ int menu(void) {
 		printf("%-3d: %s\n", i, programList[i]);
 	}
 	printf("\n");
-	printf("--> %d program(s) in total\n", ProgramCount);
+	printf("--> %lu program(s) in total\n", ProgramCount);
 	printf("\n");
 
 	return 0;
