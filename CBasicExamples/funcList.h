@@ -17,6 +17,8 @@
 #include "Algorithm/Dynamic-Programming/rod_cutting.h"
 #include "Algorithm/Dynamic-Programming/minimum_number_of_coins.h"
 #include "Algorithm/Dynamic-Programming/weighted_interval_scheduling.h"
+#include "Algorithm/Dynamic-Programming/highway_billboards.h"
+#include "Algorithm/Dynamic-Programming/minimum_steps_to_one.h"
 
 char* programList[] = {
     "Hello World", 
@@ -32,7 +34,9 @@ char* programList[] = {
     "array demonstration",
     "Algorithm: Dynamic Programming - Rod Cutting Problem",
     "Algorithm: Dynamic Programming - Minimum Number of Coins",
-    "Algorithm: Dynamic Programming - Weighted Interval Scheduling"
+    "Algorithm: Dynamic Programming - Weighted Interval Scheduling",
+    "Algorithm: Dynamic Programming - Highway Billboards Problem",
+    "Algorithm: Dynamic Programming - Minimum Steps To 1"
 };
 int (*programFunc[])(int argc, char** argv) = {
     helloWorldMain, 
@@ -48,7 +52,9 @@ int (*programFunc[])(int argc, char** argv) = {
     array_demo_main,
     alg_dp_rod_cutting_main,
     alg_dp_minimum_number_of_coins_main,
-    alg_dp_weighted_interval_scheduling_main
+    alg_dp_weighted_interval_scheduling_main,
+    alg_dp_highway_billboards_main,
+    alg_dp_minimum_steps_to_one_main
 };
 
 // Define the program count

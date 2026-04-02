@@ -135,7 +135,7 @@ wis_result weighted_interval_scheduling(const job * jobs_ref, int n)
         int overall_weight = weight + latest_compatible_weight;
 
         // Test if we've got a higher weight
-        if (MAXIMUM_WEIGHT[job_idx] < overall_weight)
+        if (MAXIMUM_WEIGHT[job_idx - 1] < overall_weight)
         {
             // Update maximum weight
             MAXIMUM_WEIGHT[job_idx] = overall_weight;
