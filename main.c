@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <inttypes.h>
 //Include header files
 #include "./CBasicExamples/assist_IO.h"
 //Include DEMO functions
@@ -58,7 +59,7 @@ int menu(void) {
 		printf("%-3d: %s\n", i, programList[i]);
 	}
 	printf("\n");
-	printf("--> %lu program(s) in total\n", ProgramCount);
+	printf("--> %" PRIu64 " program(s) in total\n", ProgramCount);
 	printf("\n");
 
 	return 0;
