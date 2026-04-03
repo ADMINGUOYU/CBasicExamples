@@ -35,11 +35,30 @@ int inputNUMRange(int min, int max)
 size_t get_size_t(void)
 {
 	size_t input;
-	while (scanf("%zd", &input) != 1)
+	while (scanf("%zu", &input) != 1)
 	{
 		while (getchar() != '\n') {}
 		printf("Invalid Input >> Try again\n");
 	}
 	while (getchar() != '\n') {}
 	return input;
+}
+
+size_t inputNUMRange_size_t(size_t min, size_t max) 
+{
+	size_t num;
+	char flag = 0;
+	while (!flag) {
+		num = get_size_t();
+		// NOTE: unsigned type will never be less than 0
+		//       if min == 0, the first condition will always be false
+		if (num < min || num > max) {
+			flag = 0;
+			printf("Out of range [%zu,%zu] >> Try again\n", min, max);
+		}
+		else {
+			flag = 1;
+		}
+	}
+	return num;
 }
