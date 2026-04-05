@@ -297,7 +297,6 @@ void free_huffman_tree(huffman_node* root)
 
     // Free the current node
     free(root);
-    root = NULL; // Set the pointer to NULL after freeing
 
     // DONE
     return;
