@@ -19,6 +19,8 @@
 #include "Algorithm/Dynamic-Programming/weighted_interval_scheduling.h"
 #include "Algorithm/Dynamic-Programming/highway_billboards.h"
 #include "Algorithm/Dynamic-Programming/minimum_steps_to_one.h"
+#include "Algorithm/Greedy/huffman.h"
+#include "Algorithm/Greedy/wifi_tower.h"
 
 char* programList[] = {
     "Hello World", 
@@ -36,7 +38,9 @@ char* programList[] = {
     "Algorithm: Dynamic Programming - Minimum Number of Coins",
     "Algorithm: Dynamic Programming - Weighted Interval Scheduling",
     "Algorithm: Dynamic Programming - Highway Billboards Problem",
-    "Algorithm: Dynamic Programming - Minimum Steps To 1"
+    "Algorithm: Dynamic Programming - Minimum Steps To 1",
+    "Algorithm: Greedy - Huffman Coding",
+    "Algorithm: Greedy - WiFi Tower Placement"
 };
 int (*programFunc[])(int argc, char** argv) = {
     helloWorldMain, 
@@ -54,7 +58,9 @@ int (*programFunc[])(int argc, char** argv) = {
     alg_dp_minimum_number_of_coins_main,
     alg_dp_weighted_interval_scheduling_main,
     alg_dp_highway_billboards_main,
-    alg_dp_minimum_steps_to_one_main
+    alg_dp_minimum_steps_to_one_main,
+    alg_greedy_huffman_main,
+    alg_greedy_wifi_tower_main
 };
 
 // Define the program count
