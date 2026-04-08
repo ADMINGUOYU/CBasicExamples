@@ -38,10 +38,36 @@ Then:
 DP[i][j] = 1 + max(DP[i-1][j], DP[i+1][j], DP[i][j-1], DP[i][j+1]) 
 if A[i][j] < A[i-1][j], A[i][j] < A[i+1][j], A[i][j] < A[i][j-1], A[i][j] < A[i][j+1])
 DP[i][j] = 1, if there are no adjacent cells with greater value than A[i][j]
+* NOTE: We can also let DP[i][j] be the length of the longest increasing path ENDING at
+cell A[i, j], and the recurrence would be similar but in reverse direction.
 
 We initialize the DP table with -1 to indicate that the value has not been computed yet. 
 When we compute DP[i][j], we check the four adjacent cells and recursively compute their 
 DP values if they have not been computed yet.
+
+Pseudocode:
+[This procedure runs n^2 times -> each cell is computed once]
+Procedure longest_increasing_path(A[1 ... n, 1 ... n]):
+    Initialize DP table with -1
+    max_length <- 0
+    for i from 1 to n DO:
+        for j from 1 to n DO:
+            DP[i][j] <- longest_increasing_path_from_cell(A, i, j, DP)
+            max_length <- max(max_length, DP[i][j])
+    return max_length
+
+[This procedure is called n^2 times,
+but each cell is computed once due to memoization;
+EACH cell's longest path is computed in O(1) time - 4 adjacent cells to check;
+EACH cell's retrieval is O(1) time due to memoization]
+Procedure longest_increasing_path_from_cell(A[1 ... n, 1 ... n], i, j, DP):
+    if DP[i][j] != -1: # DP memorization check
+        return DP[i][j]
+    DP[i][j] <- 1 # The cell itself counts as a path of length 1
+    for each (next_i, next_j) in [(i-1, j), (i+1, j), (i, j-1), (i, j+1)] DO: # ALL 4 directions
+        if next_i and next_j are within bounds of A AND A[i][j] < A[next_i][next_j]:
+            DP[i][j] <- max(DP[i][j], 1 + longest_increasing_path_from_cell(A, next_i, next_j, DP))
+    return DP[i][j]
 
 Running time: [each cell ONLY computed once]
 The time complexity of this approach is O(n^2) because we compute the longest
