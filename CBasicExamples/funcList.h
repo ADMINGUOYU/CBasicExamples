@@ -19,6 +19,9 @@
 #include "Algorithm/Dynamic-Programming/weighted_interval_scheduling.h"
 #include "Algorithm/Dynamic-Programming/highway_billboards.h"
 #include "Algorithm/Dynamic-Programming/minimum_steps_to_one.h"
+#include "Algorithm/Dynamic-Programming/longest_increasing_path.h"
+#include "Algorithm/Dynamic-Programming/2D_0-1_knapsack.h"
+#include "Algorithm/Dynamic-Programming/2D_longest_common_sequence.h"
 #include "Algorithm/Greedy/huffman.h"
 #include "Algorithm/Greedy/wifi_tower.h"
 
@@ -39,6 +42,9 @@ char* programList[] = {
     "Algorithm: Dynamic Programming - Weighted Interval Scheduling",
     "Algorithm: Dynamic Programming - Highway Billboards Problem",
     "Algorithm: Dynamic Programming - Minimum Steps To 1",
+    "Algorithm: Dynamic Programming - Longest Increasing Path (TOP DOWN with memoization)",
+    "Algorithm: Dynamic Programming - [2D] 0/1 Knapsack Problem",
+    "Algorithm: Dynamic Programming - [2D] Longest Common Subsequence",
     "Algorithm: Greedy - Huffman Coding",
     "Algorithm: Greedy - WiFi Tower Placement"
 };
@@ -59,6 +65,9 @@ int (*programFunc[])(int argc, char** argv) = {
     alg_dp_weighted_interval_scheduling_main,
     alg_dp_highway_billboards_main,
     alg_dp_minimum_steps_to_one_main,
+    alg_dp_longest_increasing_path_main,
+    alg_dp_2d_0_1_knapsack_main,
+    alg_dp_2d_longest_common_sequence_main,
     alg_greedy_huffman_main,
     alg_greedy_wifi_tower_main
 };
