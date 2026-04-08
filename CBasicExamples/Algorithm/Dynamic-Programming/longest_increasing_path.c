@@ -1,4 +1,4 @@
-// Dynamic Programming (TOP DOWN with memoization)
+// Dynamic Programming (TOP DOWN with memorization)
 // Longest Increasing Path in a Matrix
 
 /*
@@ -57,9 +57,9 @@ Procedure longest_increasing_path(A[1 ... n, 1 ... n]):
     return max_length
 
 [This procedure is called n^2 times,
-but each cell is computed once due to memoization;
+but each cell is computed once due to memorization;
 EACH cell's longest path is computed in O(1) time - 4 adjacent cells to check;
-EACH cell's retrieval is O(1) time due to memoization]
+EACH cell's retrieval is O(1) time due to memorization]
 Procedure longest_increasing_path_from_cell(A[1 ... n, 1 ... n], i, j, DP):
     if DP[i][j] != -1: # DP memorization check
         return DP[i][j]
@@ -72,7 +72,7 @@ Procedure longest_increasing_path_from_cell(A[1 ... n, 1 ... n], i, j, DP):
 Running time: [each cell ONLY computed once]
 The time complexity of this approach is O(n^2) because we compute the longest
 path starting from each cell at most once, and each cell's longest path is computed
-in O(1) time after the initial computation (due to memoization).
+in O(1) time after the initial computation (due to memorization).
 */
 
 #include <stdio.h>

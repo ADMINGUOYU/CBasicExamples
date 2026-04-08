@@ -42,7 +42,7 @@ char* programList[] = {
     "Algorithm: Dynamic Programming - Weighted Interval Scheduling",
     "Algorithm: Dynamic Programming - Highway Billboards Problem",
     "Algorithm: Dynamic Programming - Minimum Steps To 1",
-    "Algorithm: Dynamic Programming - Longest Increasing Path (TOP DOWN with memoization)",
+    "Algorithm: Dynamic Programming - Longest Increasing Path (TOP DOWN with memorization)",
     "Algorithm: Dynamic Programming - [2D] 0/1 Knapsack Problem",
     "Algorithm: Dynamic Programming - [2D] Longest Common Subsequence",
     "Algorithm: Greedy - Huffman Coding",
