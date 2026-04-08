@@ -211,7 +211,7 @@ int alg_dp_longest_increasing_path_main(int argc, char* argv[])
     int n = 4;
     int ** A = (int **) malloc (n * sizeof(int *));
     for (int i = 0; i < n; ++i) A[i] = (int *) malloc (n * sizeof(int));
-    A[0][0] =  7; A[0][1] =  6; A[0][2] = 5; A[0][3] = 4;
+    A[0][0] =  7; A[0][1] =  6; A[0][2] =  5; A[0][3] = 4;
     A[1][0] =  8; A[1][1] = 15; A[1][2] = 14; A[1][3] = 3;
     A[2][0] =  9; A[2][1] = 15; A[2][2] = 13; A[2][3] = 2;
     A[3][0] = 10; A[3][1] = 11; A[3][2] = 12; A[3][3] = 1;
