@@ -22,6 +22,7 @@
 #include "Algorithm/Dynamic-Programming/longest_increasing_path.h"
 #include "Algorithm/Dynamic-Programming/2D_0-1_knapsack.h"
 #include "Algorithm/Dynamic-Programming/2D_longest_common_sequence.h"
+#include "Algorithm/Dynamic-Programming/2D_edit_distance.h"
 #include "Algorithm/Greedy/huffman.h"
 #include "Algorithm/Greedy/wifi_tower.h"
 
@@ -45,6 +46,7 @@ char* programList[] = {
     "Algorithm: Dynamic Programming - Longest Increasing Path (TOP DOWN with memorization)",
     "Algorithm: Dynamic Programming - [2D] 0/1 Knapsack Problem",
     "Algorithm: Dynamic Programming - [2D] Longest Common Subsequence",
+    "Algorithm: Dynamic Programming - [2D] Edit Distance",
     "Algorithm: Greedy - Huffman Coding",
     "Algorithm: Greedy - WiFi Tower Placement"
 };
@@ -68,6 +70,7 @@ int (*programFunc[])(int argc, char** argv) = {
     alg_dp_longest_increasing_path_main,
     alg_dp_2d_0_1_knapsack_main,
     alg_dp_2d_longest_common_sequence_main,
+    alg_dp_2d_edit_distance_main,
     alg_greedy_huffman_main,
     alg_greedy_wifi_tower_main
 };
