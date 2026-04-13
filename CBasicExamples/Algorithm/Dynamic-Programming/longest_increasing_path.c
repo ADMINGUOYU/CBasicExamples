@@ -73,6 +73,27 @@ Running time: [each cell ONLY computed once]
 The time complexity of this approach is O(n^2) because we compute the longest
 path starting from each cell at most once, and each cell's longest path is computed
 in O(1) time after the initial computation (due to memorization).
+
+NOTE: We can turn this into a bottom-up approach by filling the DP table iteratively.
+      However, we have to do sorting.
+      [Instead of making A[i][j] be the length of the longest path STARING at cell (i, j),
+       we can make A[i][j] be the length of the longest path ENDING at cell (i, j).
+       Then we can fill the DP table in increasing order of A[i][j] values.]
+      
+    - We pre-fill the DP table with 1s (each cell itself is a path of length 1),
+      and then we sort the cells by their values in A. <- O(n^2 log(n^2)) = O(n^2 log n)
+      
+    - Then we iterate through the sorted cells and update the DP values based on the adjacent cells.
+      This makes sure that when we process a cell, all the cells with smaller values have already
+      been processed, and we can use their DP values to compute the current cell's DP value.
+      
+    - The way of filling the DP table is similar to the top-down approach, as well as
+      how we backtrace the longest path.
+
+    - Time complexity of the bottom-up approach is O(n^2 log n) due to sorting,
+      and O(n^2) for filling the DP table.
+
+    - Overall time complexity is O(n^2 log n) for the bottom-up approach.
 */
 
 #include <stdio.h>

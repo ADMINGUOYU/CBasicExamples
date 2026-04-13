@@ -56,7 +56,7 @@ int large_uint_mul_main(int argc, char *argv[])
     free(multiplicand);
     free(multiplier);
 
-    // prompt use, continue?
+    // prompt user, continue?
     printf("Great! All DONE :-)\n");
     
     return 0;
