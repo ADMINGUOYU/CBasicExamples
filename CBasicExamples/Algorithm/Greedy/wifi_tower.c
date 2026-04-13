@@ -38,7 +38,7 @@ PROOF:
    This proves that our greedy solution is optimum
 
 RUNNING TIME:
- - Sorting the: O(n log n) -> we use qsort in C in this implementation
+ - Sorting the buildings: O(n log n) -> we use qsort in C in this implementation
  - Placing the towers: O(n) -> we iterate through the buildings once
  - Overall: O(n log n) + O(n) = O(n log n)
 */
