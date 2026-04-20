@@ -325,6 +325,7 @@ int alg_dp_2d_edit_distance_main(int argc, char* argv[])
         else printf("      └── ");
 
         // Get the current edit operation
+        // NOTE: the position might NOT be correct after insertions/deletions
         edit current_op = result.operations[i];
         if (current_op.op == INSERTION)
             printf("Insert '%c' at position %d\n", current_op.character, current_op.position);

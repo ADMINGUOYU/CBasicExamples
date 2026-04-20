@@ -23,6 +23,7 @@
 #include "Algorithm/Dynamic-Programming/2D_0-1_knapsack.h"
 #include "Algorithm/Dynamic-Programming/2D_longest_common_sequence.h"
 #include "Algorithm/Dynamic-Programming/2D_edit_distance.h"
+#include "Algorithm/Dynamic-Programming/2D_egg_dropping.h"
 #include "Algorithm/Dynamic-Programming/INT_longest_palindromic_substring.h"
 #include "Algorithm/Greedy/huffman.h"
 #include "Algorithm/Greedy/wifi_tower.h"
@@ -48,6 +49,7 @@ char* programList[] = {
     "Algorithm: Dynamic Programming - [2D] 0/1 Knapsack Problem",
     "Algorithm: Dynamic Programming - [2D] Longest Common Subsequence",
     "Algorithm: Dynamic Programming - [2D] Edit Distance",
+    "Algorithm: Dynamic Programming - [2D] Egg Dropping Problem",
     "Algorithm: Dynamic Programming - [INTERVAL] Longest Palindromic Substring",
     "Algorithm: Greedy - Huffman Coding",
     "Algorithm: Greedy - WiFi Tower Placement"
@@ -73,6 +75,7 @@ int (*programFunc[])(int argc, char** argv) = {
     alg_dp_2d_0_1_knapsack_main,
     alg_dp_2d_longest_common_sequence_main,
     alg_dp_2d_edit_distance_main,
+    alg_dp_2d_egg_dropping_main,
     alg_dp_int_longest_palindromic_substring_main,
     alg_greedy_huffman_main,
     alg_greedy_wifi_tower_main
