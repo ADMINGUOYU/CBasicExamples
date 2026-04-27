@@ -6,6 +6,47 @@
 
 #define MAX_INPUT_BUFFER_SIZE 100
 
+/*
+    Background knowledge (to this algorithm):
+    1. recall how you do multiplication by hand, 
+       you multiply multiplicand with each digit of multiplier,
+       and add them together.
+    2. You start with the least significant digit of multiplier,
+       and move to the most significant digit.
+    3. So in theory, We need THREE buffers:
+       1. multiplicand_buff: to store multiplicand, size = op_bits
+       2. multiplier_buff: to store multiplier, size = op_bits
+       3. op_buff: to store intermediate result and final result, size = 2 * op_bits
+       * WHY 2 * op_bits? Because the result of multiplying two n-digit numbers can have up to 2n digits.
+    4. In this implementation, we can directly copy multiplier to op_buff,
+       and use multiplicand_buff to store multiplicand, so we can save one buffer.
+       - LAYOUT:
+         multiplicand_buff: [ ... : op_bits - 1] -> multiplicand
+         op_buff: [0 : op_bits - 1] -> intermediate result (initially multiplier)
+                  [op_bits : 2 * op_bits - 1] -> final result (initially 0)
+       - More intuitively, for op_buffer:
+         Initially:
+            0 [ ooooooooooo | ........... ] len(op_buff) - 1
+              <empty>      <multiplier>
+         WHEN calculating:
+            0 [ ooooooooooo | ..........M ] len(op_buff) - 1
+            - We take M (the least significant digit of multiplier) to multiply with multiplicand_buff (every element),
+            - Add the result to the LEFT part of the op_buff
+         AFTER one step of multiplication:
+            0 [ RRRRRRRRRRR | ..........M ] len(op_buff) - 1
+            - NOTE: The actual result is C'RRRRRRRRRRR'
+                    where C is the carry
+                    (remember that n digit * 1 digit can have at most n + 1 digits)
+         We do the shift, to the RIGHT:
+            0 [ CRRRRRRRRRRR | .......... ] len(op_buff) - 1
+            - NOTE: the carry is appended at the beginning
+            - NOTE: the USED multiplier M is discarded during the shift
+    5. We repeat the above process until we have processed all digits of multiplier
+       (HINT: in total op_bits times)
+    6. After the above process, we have the final result in the RIGHT part of op_buff
+       op_buff[op_bits : END]
+*/
+
 // forward declaration
 char* large_uint_mul(const char* multiplicand, const char* multiplier);
 void get_input_safe(char* buff);
