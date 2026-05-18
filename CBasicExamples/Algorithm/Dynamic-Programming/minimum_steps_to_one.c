@@ -26,7 +26,7 @@ NOTE: Greedy algorithm is not optimal for this problem,
 #define ACTION_SUBTRACT_1 1
 #define ACTION_DIVIDE_2 2
 #define ACTION_DIVIDE_3 3
-char * action_to_string (int action)
+static char * action_to_string (int action)
 {
     switch (action)
     {
@@ -52,7 +52,7 @@ typedef struct minimum_steps_to_one_result
 } minimum_steps_to_one_result;
 
 // Greedy algorithm for minimum steps to one
-minimum_steps_to_one_result greedy_minimum_steps_to_one(int n)
+static minimum_steps_to_one_result greedy_minimum_steps_to_one(int n)
 {
     // GREEDY ALGORITHM:
     // -> we choose the action that reduces n the most at each step,
@@ -102,7 +102,7 @@ minimum_steps_to_one_result greedy_minimum_steps_to_one(int n)
 }
 
 // Dynamic programming algorithm for minimum steps to one
-minimum_steps_to_one_result dp_minimum_steps_to_one(int n)
+static minimum_steps_to_one_result dp_minimum_steps_to_one(int n)
 {
     // For recursive approach, we try all options and choose the one
     // with minimum steps, now, we do the bottom-up.

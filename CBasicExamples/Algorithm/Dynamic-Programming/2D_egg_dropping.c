@@ -59,7 +59,7 @@ typedef struct egg_dropping_result
 } egg_dropping_result;
 
 // 2D DP solution for egg dropping problem
-egg_dropping_result egg_dropping(int N, int F)
+static egg_dropping_result egg_dropping(int N, int F)
 {
     // create a 2D DP table
     // D[EGG][FLOOR]

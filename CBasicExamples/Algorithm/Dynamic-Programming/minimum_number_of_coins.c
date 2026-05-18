@@ -29,7 +29,7 @@ typedef struct min_coin_result
 } min_coin_result;
 
 // Minimum number of coins function
-min_coin_result minimum_number_of_coins(int coins[], int m, int V)
+static min_coin_result minimum_number_of_coins(int coins[], int m, int V)
 {
     /*
     Argument explanation:

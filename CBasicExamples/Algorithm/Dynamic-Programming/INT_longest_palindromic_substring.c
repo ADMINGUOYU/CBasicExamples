@@ -63,7 +63,7 @@ typedef struct lps_result
 } lps_result;
 
 // Solver function
-lps_result longest_palindromic_substring(const char * X)
+static lps_result longest_palindromic_substring(const char * X)
 {
     // Get the length of the input string
     int n = strlen(X);

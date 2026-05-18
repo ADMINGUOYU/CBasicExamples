@@ -59,7 +59,7 @@ typedef struct lcs_result
 } lcs_result;
 
 // 2D DP solution for longest common subsequence problem
-lcs_result longest_common_subsequence(const char * X, const char * Y)
+static lcs_result longest_common_subsequence(const char * X, const char * Y)
 {
     /*
     Argument explanation:

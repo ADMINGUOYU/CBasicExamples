@@ -93,7 +93,7 @@ typedef struct knapsack_result
 } knapsack_result;
 
 // 2D DP solution for 0/1 Knapsack problem
-knapsack_result knapsack_0_1(const item * items, int n, int W)
+static knapsack_result knapsack_0_1(const item * items, int n, int W)
 {
     /*
     Argument explanation:

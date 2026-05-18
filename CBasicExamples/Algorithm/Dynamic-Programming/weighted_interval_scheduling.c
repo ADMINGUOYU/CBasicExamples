@@ -39,7 +39,7 @@ typedef struct wis_result
 } wis_result;
 
 // Compare function for qsort (sort by finish time)
-int compare(const void * a, const void * b)
+static int compare(const void * a, const void * b)
 {   
     /*
     Note regarding the return value:
@@ -57,7 +57,7 @@ int compare(const void * a, const void * b)
 }
 
 // Weighted Interval Scheduling function
-wis_result weighted_interval_scheduling(const job * jobs_ref, int n)
+static wis_result weighted_interval_scheduling(const job * jobs_ref, int n)
 {
     // Make a deep copy of jobs_ref
     job * jobs = (job * ) malloc ((n + 1) * sizeof(job));

@@ -110,7 +110,7 @@ typedef struct edit_distance_result
 } edit_distance_result;
 
 // Function to calculate the edit distance and the operations
-edit_distance_result calculate_edit_distance(const char *s, const char *t)
+static edit_distance_result calculate_edit_distance(const char *s, const char *t)
 {
     // Get the lengths of the input strings
     int m = strlen(s);

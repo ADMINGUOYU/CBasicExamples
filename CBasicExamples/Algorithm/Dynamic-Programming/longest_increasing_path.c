@@ -112,7 +112,7 @@ typedef struct longest_increasing_path_result
 } longest_increasing_path_result;
 
 // Helper function to compute the longest increasing path starting from cell (i, j)
-int longest_increasing_path_from_cell(const int ** A, int n, int i, int j, int ** DP, int (* path_table)[2])
+static int longest_increasing_path_from_cell(const int ** A, int n, int i, int j, int ** DP, int (* path_table)[2])
 {
 
     /*
@@ -155,7 +155,7 @@ int longest_increasing_path_from_cell(const int ** A, int n, int i, int j, int *
 }
 
 // DP solution for longest increasing path in a matrix
-longest_increasing_path_result longest_increasing_path(const int ** A, int n)
+static longest_increasing_path_result longest_increasing_path(const int ** A, int n)
 {
     /*
     Argument explanation:

@@ -53,23 +53,23 @@ typedef struct result_mapping_table {
 // Function prototypes
 // ================================
 // Min-Heap functions
-min_heap* create_min_heap(int capacity);
-void insert_min_heap(min_heap* heap, huffman_node* node);
-huffman_node* extract_min(min_heap* heap);
+static min_heap* create_min_heap(int capacity);
+static void insert_min_heap(min_heap* heap, huffman_node* node);
+static huffman_node* extract_min(min_heap* heap);
 // Huffman Tree functions
-huffman_node* create_huffman_node(char character, int frequency);
-void build_huffman_tree(char_freq_pair* char_freqs, int n, huffman_node** root);
-void generate_codes(huffman_node* root, char* code, int depth, result_mapping_table* mapping_table);
-void free_huffman_tree(huffman_node* root);
-void free_result_mapping_table(result_mapping_table* mapping_table);
-// Function to print the character-code pairs
-void print_character_codes(result_mapping_table* mapping_table);
+static huffman_node* create_huffman_node(char character, int frequency);
+static void build_huffman_tree(char_freq_pair* char_freqs, int n, huffman_node** root);
+static void generate_codes(huffman_node* root, char* code, int depth, result_mapping_table* mapping_table);
+static void free_huffman_tree(huffman_node* root);
+static void free_result_mapping_table(result_mapping_table* mapping_table);
+// Solver function
+static result_mapping_table* huffman_coding_solver(char_freq_pair* char_freqs, int n);
 
 // ================================
 // Utility function definitions
 // ================================
 // Min-Heap functions
-min_heap* create_min_heap(int capacity)
+static min_heap* create_min_heap(int capacity)
 {
     // Allocate memory for the min-heap structure
     min_heap* heap = (min_heap*) malloc (sizeof(min_heap));
@@ -83,7 +83,7 @@ min_heap* create_min_heap(int capacity)
 
     return heap;
 }
-void insert_min_heap(min_heap* heap, huffman_node* node)
+static void insert_min_heap(min_heap* heap, huffman_node* node)
 {
     // Insert the node into the min-heap and maintain the heap property
 
@@ -120,7 +120,7 @@ void insert_min_heap(min_heap* heap, huffman_node* node)
     // DONE
     return;
 }
-huffman_node* extract_min(min_heap* heap)
+static huffman_node* extract_min(min_heap* heap)
 {
     // Extract the node with the minimum frequency from the min-heap and maintain the heap property
 
@@ -172,7 +172,7 @@ huffman_node* extract_min(min_heap* heap)
     return min_node;
 }
 // Huffman Tree functions
-huffman_node* create_huffman_node(char character, int frequency)
+static huffman_node* create_huffman_node(char character, int frequency)
 {
     // Allocate memory for a new huffman node
     huffman_node* node = (huffman_node*) malloc (sizeof(huffman_node));
@@ -187,7 +187,7 @@ huffman_node* create_huffman_node(char character, int frequency)
 
     return node;
 }
-void build_huffman_tree(char_freq_pair* char_freqs, int n, huffman_node** root)
+static void build_huffman_tree(char_freq_pair* char_freqs, int n, huffman_node** root)
 {
     // Build the huffman tree using the given character-frequency pairs
 
@@ -238,7 +238,7 @@ void build_huffman_tree(char_freq_pair* char_freqs, int n, huffman_node** root)
     // DONE
     return;
 }
-void generate_codes(huffman_node* root, char* code, int depth, result_mapping_table* mapping_table)
+static void generate_codes(huffman_node* root, char* code, int depth, result_mapping_table* mapping_table)
 {
     // Generate the binary codes for each character by traversing the huffman tree
     // NOTE: result mapping table should have enough capacity to store all character-code pairs (size >= number of characters)
@@ -285,7 +285,7 @@ void generate_codes(huffman_node* root, char* code, int depth, result_mapping_ta
     // DONE
     return;
 }
-void free_huffman_tree(huffman_node* root)
+static void free_huffman_tree(huffman_node* root)
 {
     // Free the memory allocated for the huffman tree using post-order traversal
     if (root == NULL)
@@ -301,7 +301,7 @@ void free_huffman_tree(huffman_node* root)
     // DONE
     return;
 }
-void free_result_mapping_table(result_mapping_table* mapping_table)
+static void free_result_mapping_table(result_mapping_table* mapping_table)
 {
     // Free the memory allocated for the result mapping table
     for (int i = 0; i < mapping_table->size; ++i)
@@ -316,7 +316,7 @@ void free_result_mapping_table(result_mapping_table* mapping_table)
 }
 
 // Solver function
-result_mapping_table* huffman_coding_solver(char_freq_pair* char_freqs, int n)
+static result_mapping_table* huffman_coding_solver(char_freq_pair* char_freqs, int n)
 {
     // Parse the input character-frequency pairs and build the huffman tree
     huffman_node* root = NULL;

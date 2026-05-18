@@ -81,22 +81,22 @@ typedef struct Graph_matrix
 
 // Function prototypes
 // List representation
-Graph_list* create_graph_list(int V);
-Graph_list* add_edge_list(Graph_list* graph, int src, int dest);
-void print_graph_list(Graph_list* graph);
-void free_graph_list(Graph_list* graph);
+static Graph_list* create_graph_list(int V);
+static Graph_list* add_edge_list(Graph_list* graph, int src, int dest);
+static void print_graph_list(Graph_list* graph);
+static void free_graph_list(Graph_list* graph);
 // Matrix representation
-Graph_matrix* create_graph_matrix(int V);
-Graph_matrix* add_edge_matrix(Graph_matrix* graph, int src, int dest);
-void print_graph_matrix(Graph_matrix* graph);
-void free_graph_matrix(Graph_matrix* graph);
+static Graph_matrix* create_graph_matrix(int V);
+static Graph_matrix* add_edge_matrix(Graph_matrix* graph, int src, int dest);
+static void print_graph_matrix(Graph_matrix* graph);
+static void free_graph_matrix(Graph_matrix* graph);
 // Conversion functions
-Graph_list* matrix_to_list(Graph_matrix* graph);
-Graph_matrix* list_to_matrix(Graph_list* graph);
+static Graph_list* matrix_to_list(Graph_matrix* graph);
+static Graph_matrix* list_to_matrix(Graph_list* graph);
 
 // Function implementations
 // List representation
-Graph_list* create_graph_list(int V)
+static Graph_list* create_graph_list(int V)
 {
     // create structure container
     Graph_list * graph = (Graph_list*)malloc(sizeof(Graph_list));
@@ -110,7 +110,7 @@ Graph_list* create_graph_list(int V)
     // return the newly created graph
     return graph;
 }
-Graph_list* add_edge_list(Graph_list* graph, int src, int dest)
+static Graph_list* add_edge_list(Graph_list* graph, int src, int dest)
 {
     // NOTE: we expand memory allocation by 2 (i.e. 1, 2, 4, 8, ...)
     // NOTE: this is a directed graph, we only add dest to the adjacency list
@@ -178,7 +178,7 @@ Graph_list* add_edge_list(Graph_list* graph, int src, int dest)
     // Return the updated graph
     return graph;  
 }
-void print_graph_list(Graph_list* graph)
+static void print_graph_list(Graph_list* graph)
 {
     // Print the graph in adjacency list format
     printf("Graph (Adjacency List):\n");
@@ -192,7 +192,7 @@ void print_graph_list(Graph_list* graph)
     }
     return;
 }
-void free_graph_list(Graph_list* graph)
+static void free_graph_list(Graph_list* graph)
 {
     // NOTE: the passed graph will be invalid after this function
 
@@ -207,7 +207,7 @@ void free_graph_list(Graph_list* graph)
     return;
 }
 // Matrix representation
-Graph_matrix* create_graph_matrix(int V)
+static Graph_matrix* create_graph_matrix(int V)
 {
     // create structure container
     Graph_matrix * graph = (Graph_matrix*)malloc(sizeof(Graph_matrix));
@@ -225,7 +225,7 @@ Graph_matrix* create_graph_matrix(int V)
     // return the newly created graph
     return graph;
 }
-Graph_matrix* add_edge_matrix(Graph_matrix* graph, int src, int dest)
+static Graph_matrix* add_edge_matrix(Graph_matrix* graph, int src, int dest)
 {
     // ERROR checking (for src and dest we use 0-indexing)
     if ((src < 0) || (src >= graph->V) ||
@@ -249,7 +249,7 @@ Graph_matrix* add_edge_matrix(Graph_matrix* graph, int src, int dest)
     // Return the updated graph
     return graph;
 }
-void print_graph_matrix(Graph_matrix* graph)
+static void print_graph_matrix(Graph_matrix* graph)
 {
     // Print the graph in adjacency matrix format
     printf("Graph (Adjacency Matrix):\n");
@@ -267,7 +267,7 @@ void print_graph_matrix(Graph_matrix* graph)
     }
     return;
 }
-void free_graph_matrix(Graph_matrix* graph)
+static void free_graph_matrix(Graph_matrix* graph)
 {
     // NOTE: the passed graph will be invalid after this function
 
@@ -281,7 +281,7 @@ void free_graph_matrix(Graph_matrix* graph)
     return;
 }
 // Conversion functions
-Graph_list* matrix_to_list(Graph_matrix* graph)
+static Graph_list* matrix_to_list(Graph_matrix* graph)
 {
     // Create a new graph in adjacency list representation
     Graph_list* new_graph = create_graph_list(graph->V);
@@ -300,7 +300,7 @@ Graph_list* matrix_to_list(Graph_matrix* graph)
     // Return the new graph
     return new_graph;
 }
-Graph_matrix* list_to_matrix(Graph_list* graph)
+static Graph_matrix* list_to_matrix(Graph_list* graph)
 {
     // Create a new graph in adjacency matrix representation
     Graph_matrix* new_graph = create_graph_matrix(graph->V);

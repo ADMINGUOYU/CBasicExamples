@@ -47,7 +47,7 @@ typedef struct highway_billboard_result
 } highway_billboard_result;
 
 // Helper function to compare billboards by location (for qsort)
-int compare_billboards(const void * a, const void * b)
+static int compare_billboards(const void * a, const void * b)
 {
     billboard * billboard_a = (billboard *) a;
     billboard * billboard_b = (billboard *) b;
@@ -55,7 +55,7 @@ int compare_billboards(const void * a, const void * b)
 }
 
 // Highway billboards function
-highway_billboard_result highway_billboards(const billboard * billboards_ref, int n, int L, int d)
+static highway_billboard_result highway_billboards(const billboard * billboards_ref, int n, int L, int d)
 {
     /*
     Argument explanation:

@@ -28,7 +28,7 @@ typedef struct rod_cut_result
 } rod_cut_result;
 
 // Rod cutting function
-rod_cut_result rod_cutting(int price[], int n)
+static rod_cut_result rod_cutting(int price[], int n)
 {
     // Initialize memory array -> bottom-up best result cache
     int * VALUE = (int * )malloc((n + 1) * sizeof(int));

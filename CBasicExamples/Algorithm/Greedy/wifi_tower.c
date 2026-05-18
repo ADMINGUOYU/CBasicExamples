@@ -67,7 +67,7 @@ typedef struct wifi_tower_result
 } wifi_tower_result;
 
 // Helper function to compare buildings by location (for qsort)
-int compare_buildings(const void * a, const void * b)
+static int compare_buildings(const void * a, const void * b)
 {
     building * building_a = (building *) a;
     building * building_b = (building *) b;
@@ -85,7 +85,7 @@ int compare_buildings(const void * a, const void * b)
 }
 
 // WIFI tower function
-wifi_tower_result wifi_tower(const building * buildings_ref, int n)
+static wifi_tower_result wifi_tower(const building * buildings_ref, int n)
 {
     // We first make a copy of the building array
     building * buildings = (building *) malloc (n * sizeof(building));
