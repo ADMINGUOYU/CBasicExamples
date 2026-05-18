@@ -21,6 +21,7 @@
 #include "Algorithm/Dynamic-Programming/minimum_steps_to_one.h"
 #include "Algorithm/Dynamic-Programming/longest_increasing_path.h"
 #include "Algorithm/Dynamic-Programming/longest_increasing_subsequence.h"
+#include "Algorithm/Dynamic-Programming/restricted_maxsum.h"
 #include "Algorithm/Dynamic-Programming/2D_0-1_knapsack.h"
 #include "Algorithm/Dynamic-Programming/2D_longest_common_sequence.h"
 #include "Algorithm/Dynamic-Programming/2D_edit_distance.h"
@@ -49,6 +50,7 @@ char* programList[] = {
     "Algorithm: Dynamic Programming - Minimum Steps To 1",
     "Algorithm: Dynamic Programming - Longest Increasing Path (TOP DOWN with memorization)",
     "Algorithm: Dynamic Programming - Longest Increasing Subsequence",
+    "Algorithm: Dynamic Programming - Restricted Max-Sum Problem",
     "Algorithm: Dynamic Programming - [2D] 0/1 Knapsack Problem",
     "Algorithm: Dynamic Programming - [2D] Longest Common Subsequence",
     "Algorithm: Dynamic Programming - [2D] Edit Distance",
@@ -77,6 +79,7 @@ int (*programFunc[])(int argc, char** argv) = {
     alg_dp_minimum_steps_to_one_main,
     alg_dp_longest_increasing_path_main,
     alg_dp_longest_increasing_subsequence_main,
+    alg_dp_restricted_maxsum_main,
     alg_dp_2d_0_1_knapsack_main,
     alg_dp_2d_longest_common_sequence_main,
     alg_dp_2d_edit_distance_main,
