@@ -128,7 +128,7 @@ int memAllocMain(int argc, char* argv[]) {
 
 }
 
-//Definition of funtion "memAlloc" -> allocate memory
+//Definition of function "memAlloc" -> allocate memory
 void* memAlloc(size_t size) {
 	void* ptr = malloc(size);
 	if (ptr == NULL) {
@@ -140,7 +140,7 @@ void* memAlloc(size_t size) {
 	return ptr;
 }
 
-//Definition of funtion "memInit"
+//Definition of function "memInit"
 int memInit(void* ptr, size_t size) {
 	char* cptr = (char*)ptr;
 	
@@ -159,7 +159,7 @@ int memInit(void* ptr, size_t size) {
 	return 0;
 }
 
-//Definition of funtion "memFree" -> frees allocated memory blocks
+//Definition of function "memFree" -> frees allocated memory blocks
 int memFree(void* ptr) {
 	//Error checking
 	if (ptr == NULL) {
@@ -176,7 +176,7 @@ int memFree(void* ptr) {
 	return 0;
 }
 
-//Definition of funtion "memPrint" -> prints contents as characters in allocated memory blocks
+//Definition of function "memPrint" -> prints contents as characters in allocated memory blocks
 int memPrint(void* ptr,size_t size) {
 	char* cptr = (char*)ptr;
 	
