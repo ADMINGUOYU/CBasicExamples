@@ -16,6 +16,9 @@ Including:
  - Graph traversal
    - Depth first search (DFS)
    - Breadth first search (BFS)
+ - Minimum spanning tree (MST) algorithms
+   - Prim's algorithm
+   - Kruskal's algorithm
  - Shortest path algorithms
    - Dijkstra's algorithm
    - Bellman-Ford algorithm
@@ -140,6 +143,20 @@ static inline int has_edge_list(Graph_list* graph, int src, int dest)
     }
 
     return NOT_FOUND_ERROR; // return NOT_FOUND_ERROR to indicate edge not found
+}
+/* LIST - get edge weight */
+static inline int get_edge_weight_list(Graph_list* graph, int src, int dest)
+{
+    // check if we have the edge
+    int index = has_edge_list(graph, src, dest);
+    // if not, error
+    if (index == VALUE_ERROR || index == NOT_FOUND_ERROR)
+    {
+        // print a warning message as VALUE_ERROR is also a number
+        printf("[ERROR] get_edge_weight_list: edge from %d to %d does not exist\n", src, dest);
+        return VALUE_ERROR; // return VALUE_ERROR to indicate error
+    }
+    return graph->adjList[src][index][1]; // return the weight of the edge
 }
 /* LIST - addition of edge */
 static inline Graph_list* add_edge_list(Graph_list* graph, int src, int dest, int weight)
@@ -705,6 +722,46 @@ static inline void print_tree_node_recursively(Graph_tree_node* node, int depth)
     for (int i = 0; i < node->num_children; ++i)
         print_tree_node_recursively(node->children[i], depth + 1);
 }
+/* Recursively Collect total edge weight - operates on list representation */
+static inline int collect_total_edge_weight_recursively_list(Graph_tree_node* node, Graph_list* graph)
+{
+    // base case - if node is NULL, return 0
+    if (!node) return 0;
+    // local variable to store total weight in the subtree rooted at node
+    int total = 0;
+    // loop all children
+    for (int i = 0; i < node->num_children; ++i)
+    {
+        // we can get the edge weight from the child to its parent
+        // since this is a tree, there is only one edge from child to parent
+        Graph_tree_node* child = node->children[i];
+        // we can get the edge weight from child to parent by looking at the adjacency list of the parent
+        // we need to find the edge from node->vertex to child->vertex in the adjacency list of node->vertex
+        int weight = get_edge_weight_list(graph, node->vertex, child->vertex);
+        // check if the returned value is VALUE_ERROR
+        if (weight == VALUE_ERROR)
+        // if we get VALUE_ERROR, either is an error or if the weight is actually VALUE_ERROR, we only prompt user the warning
+            printf("[WARNING] collect_total_edge_weight_recursively_list: edge from %d to %d is reported to have weight VALUE_ERROR(%d), please inspect if there's a earlier error printout.\n", node->vertex, child->vertex, weight);
+
+        // we add the weight to total
+        total += weight;
+        // we also need to add the total weight in the subtree rooted at child
+        total += collect_total_edge_weight_recursively_list(child, graph);
+    }
+    return total;
+}
+/* Collect total edge weight - operates on list representation */
+static inline int collect_total_edge_weight_list(Graph_tree* tree, Graph_list* graph)
+{
+    // if tree is NULL, just return 0
+    if (!tree) return 0;
+    // init total weight to 0
+    int total = 0;
+    // collect total edge weight
+    total = collect_total_edge_weight_recursively_list(tree->root, graph);
+    // return the total weight
+    return total;
+}
 /* Print the whole tree (root first) */
 static inline void print_graph_tree(Graph_tree* tree)
 {
@@ -910,6 +967,131 @@ static inline Graph_tree* dfs_traversal_list(Graph_list* graph, int start_vertex
     free(stack_next_adj_idx);
 
     // return the traversal tree
+    return tree;
+}
+
+// =================================================
+// Minimum Spanning Tree (MST) algorithms
+// =================================================
+/* Prim's MST on list representation */
+static inline Graph_tree* prim_mst_list(Graph_list* graph, int start_vertex)
+{
+    // NOTE: this uses an array-based priority queue of edges: [from, to, weight]
+    // NOTE: we use brute force linear scan to extract-min
+    // just for demonstration purpose
+
+    // ERROR checking: graph should not be NULL and should have at least 1 vertex
+    if (!graph) { printf("[ERROR] prim_mst_list: graph is NULL\n"); return NULL; }
+    if (graph->V <= 0)
+    {
+        printf("[ERROR] prim_mst_list: graph should have at least 1 vertex\n");
+        return NULL;
+    }
+
+    // create MST tree with the specified start vertex as root
+    Graph_tree* tree = create_graph_tree(start_vertex);
+    if (!tree) return NULL;
+
+    // visited/in-MST tracking (init to 0)
+    int* in_mst = (int*)calloc(graph->V, sizeof(int));
+    if (!in_mst)
+    {
+        printf("[ERROR] prim_mst_list: calloc failed\n");
+        free_graph_tree(tree);
+        return NULL;
+    }
+
+    // array-based priority queue: each row is [from, to, weight]
+    // at most we have all edges in the graph
+    int pq_capacity = (graph->E > 0) ? graph->E : 1;
+    int (*pq)[3] = (int (*)[3])malloc(pq_capacity * sizeof(int[3]));
+    if (!pq)
+    {
+        printf("[ERROR] prim_mst_list: malloc failed for priority queue\n");
+        free(in_mst);
+        free_graph_tree(tree);
+        return NULL;
+    }
+    // current size of the priority queue (marks last available index)
+    int pq_size = 0;
+
+    // start from the specified vertex
+    in_mst[start_vertex] = 1;   // mark it as in MST
+    if (graph->adjList[start_vertex] != NULL)   // look into it's adjacency list (edges out)
+        for (int i = 0; i < graph->adjSize[start_vertex]; ++i)
+        {
+            /* FROM:  */ pq[pq_size][0] = start_vertex;
+            /* TO:    */ pq[pq_size][1] = graph->adjList[start_vertex][i][0];
+            /* WEIGHT:*/ pq[pq_size][2] = graph->adjList[start_vertex][i][1];
+            pq_size += 1;
+        }
+
+    // build MST by selecting minimum crossing edge each time
+    int mst_edges = 0;  // we expect V - 1 edges in the MST (if not not connected)
+    while (pq_size > 0 && mst_edges < graph->V - 1)
+    {
+        // extract-min from array-based priority queue (linear scan)
+        int min_idx = 0;
+        for (int i = 1; i < pq_size; ++i)
+            if (pq[i][2] < pq[min_idx][2]) min_idx = i;
+
+        // get the current minimum edge from the priority queue
+        int from = pq[min_idx][0];
+        int to = pq[min_idx][1];
+
+        // remove selected item by swap-with-last
+        pq[min_idx][0] = pq[pq_size - 1][0];
+        pq[min_idx][1] = pq[pq_size - 1][1];
+        pq[min_idx][2] = pq[pq_size - 1][2];
+        pq_size -= 1;
+
+        // skip if destination vertex already in MST
+        if (in_mst[to]) continue;
+
+        // add the chosen edge to MST tree
+        if (!add_tree_node(tree, from, to))
+        {
+            free(pq);
+            free(in_mst);
+            free_graph_tree(tree);
+            return NULL;
+        }
+
+        // mark the new vertex as in MST
+        in_mst[to] = 1;
+        mst_edges += 1;
+
+        // push outgoing edges from newly added vertex
+        if (graph->adjList[to] != NULL)
+            for (int i = 0; i < graph->adjSize[to]; ++i)
+            {
+                int next = graph->adjList[to][i][0];
+                if (!in_mst[next])
+                {
+                    if (pq_size >= pq_capacity)
+                    {
+                        // this should not happen if graph->E is accurate
+                        printf("[ERROR] prim_mst_list: unexpected priority queue overflow\n");
+                        free(pq);
+                        free(in_mst);
+                        free_graph_tree(tree);
+                        return NULL;
+                    }
+                    pq[pq_size][0] = to;
+                    pq[pq_size][1] = next;
+                    pq[pq_size][2] = graph->adjList[to][i][1];
+                    pq_size += 1;
+                }
+            }
+    }
+
+    // if graph is disconnected, we only get MST of the reachable component from the start vertex
+    if (mst_edges != graph->V - 1)
+        printf("[WARNING] prim_mst_list: graph may be disconnected, MST covers reachable component from root %d\n", start_vertex);
+
+    // cleanup and return
+    free(pq);
+    free(in_mst);
     return tree;
 }
 
