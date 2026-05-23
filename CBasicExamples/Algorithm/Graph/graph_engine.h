@@ -1,7 +1,7 @@
 /*
 File: graph_engine.h
 LANGUAGE: C99
-NOT MENT TO BE RUN DIRECTLY
+NOT MEANT TO BE RUN DIRECTLY
 PLEASE MAKE SURE YOU DON'T HAVE NAMING CONFLICTS
 
 FUNCTIONS HERE WILL BE DEFINED IN 'static inline' STYLE,
@@ -32,6 +32,14 @@ Including:
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
+
+// =================================================
+// Define ERRORS (ERRORs are ALL NEGATIVE numbers)
+// =================================================
+// Value error
+#define VALUE_ERROR INT_MIN
+// Not found error
+#define NOT_FOUND_ERROR -1
 
 // =================================================
 // Define of graph representations
@@ -104,10 +112,10 @@ static inline void free_graph_list(Graph_list* graph)
    LIST - search for edge 
    if found, will return index of dest in the adjacency list of src
    (i.e. position in the list)
-   if not found, will return -1
+   if not found, will return NOT_FOUND_ERROR
 
-   Safe to call if src/dest is out of range, will return -1 and print error message
-   Safe to call if src has no adjacency list (i.e. no outgoing edge), will return -1
+   Safe to call if src/dest is out of range, will return VALUE_ERROR and print error message
+   Safe to call if src has no adjacency list (i.e. no outgoing edge), will return NOT_FOUND_ERROR
 */
 static inline int has_edge_list(Graph_list* graph, int src, int dest)
 {
@@ -116,7 +124,7 @@ static inline int has_edge_list(Graph_list* graph, int src, int dest)
         (dest < 0) || (dest >= graph->V))
     {
         printf("[ERROR] has_edge_list: 'src'/'dest' should be within [0, %d)\n", graph->V);
-        return -1; // return -1 to indicate error
+        return VALUE_ERROR; // return VALUE_ERROR to indicate error
     }
 
     // Check if dest is in the adjacency list of src
@@ -129,7 +137,7 @@ static inline int has_edge_list(Graph_list* graph, int src, int dest)
         }
     }
 
-    return -1; // return -1 to indicate edge not found
+    return NOT_FOUND_ERROR; // return NOT_FOUND_ERROR to indicate edge not found
 }
 /* LIST - addition of edge */
 static inline Graph_list* add_edge_list(Graph_list* graph, int src, int dest, int weight)
@@ -143,7 +151,13 @@ static inline Graph_list* add_edge_list(Graph_list* graph, int src, int dest, in
     // ERROR checking (for src and dest we use 0-indexing) -> checked in has_edge_list
     // ERROR checking (parallel edge NOT allowed)
     // We can check if dest is already in the adjacency list of src
-    if (has_edge_list(graph, src, dest) != -1)
+    int index = has_edge_list(graph, src, dest);
+    if (index == VALUE_ERROR)
+    {
+        // This means src/dest is out of range, we just return unchanged graph
+        return graph;
+    }
+    if (index != NOT_FOUND_ERROR)
     {
         printf("[ERROR] add_edge_list: parallel edge from %d to %d is NOT allowed\n", src, dest);
         return graph; // return unchanged graph
@@ -210,7 +224,12 @@ static inline Graph_list* remove_edge_list(Graph_list* graph, int src, int dest)
     // ERROR checking (edge should exist to be removed)
     // Find index of dest in the adjacency list of src
     int index = has_edge_list(graph, src, dest);
-    if (index == -1)
+    if (index == VALUE_ERROR)
+    {
+        // This means src/dest is out of range, we just return unchanged graph
+        return graph;
+    }
+    if (index == NOT_FOUND_ERROR)
     {
         printf("[ERROR] remove_edge_list: no edge from %d to %d exists\n", src, dest);
         return graph; // return unchanged graph
@@ -306,7 +325,10 @@ static inline void free_graph_matrix(Graph_matrix* graph)
 }
 /* 
    MATRIX - search for edge
-   DIFFERENT from list, return 0 (false) or 1 (true) directly
+
+   if found, will return 1 (true)
+   if not found, will return NOT_FOUND_ERROR
+   if src/dest is out of range, will return VALUE_ERROR and print error message
 */
 static inline int has_edge_matrix(Graph_matrix* graph, int src, int dest)
 {
@@ -314,19 +336,25 @@ static inline int has_edge_matrix(Graph_matrix* graph, int src, int dest)
     if (src < 0 || src >= graph->V || dest < 0 || dest >= graph->V)
     {
         printf("[ERROR] has_edge_matrix: Invalid vertex indices\n");
-        return 0; // return 0 to indicate error (no edge)
+        return VALUE_ERROR; // return VALUE_ERROR to indicate error (no edge)
     }
 
     // Return the value at the intersection of the two vertices
-    // NOTE: this returns 1 if there is an edge, and 0 if there is no edge
-    return graph->matrix[src][dest] != 0;
+    // NOTE: this returns 1 if there is an edge, and NOT_FOUND_ERROR if there is no edge
+    return (graph->matrix[src][dest] != 0) ? 1 : NOT_FOUND_ERROR;
 }
 /* MATRIX - addition of edge */
 static inline Graph_matrix* add_edge_matrix(Graph_matrix* graph, int src, int dest, int weight)
 {
     // ERROR checking (for src and dest we use 0-indexing) -> checked in has_edge_matrix
     // ERROR checking (parallel edge NOT allowed)
-    if (has_edge_matrix(graph, src, dest) == 1)
+    int edge_check = has_edge_matrix(graph, src, dest);
+    if (edge_check == VALUE_ERROR)
+    {
+        // This means src/dest is out of range, we just return unchanged graph
+        return graph;
+    }
+    if (edge_check == 1)
     {
         printf("[ERROR] add_edge_matrix: parallel edge from %d to %d is NOT allowed\n", src, dest);
         return graph; // return unchanged graph
@@ -351,7 +379,13 @@ static inline Graph_matrix* remove_edge_matrix(Graph_matrix* graph, int src, int
 {
     // ERROR checking (for src and dest we use 0-indexing) -> checked in has_edge_matrix
     // ERROR checking (edge should exist to be removed)
-    if (has_edge_matrix(graph, src, dest) == 0)
+    int edge_check = has_edge_matrix(graph, src, dest);
+    if (edge_check == VALUE_ERROR)
+    {
+        // This means src/dest is out of range, we just return unchanged graph
+        return graph;
+    }
+    if (edge_check == NOT_FOUND_ERROR)
     {
         printf("[ERROR] remove_edge_matrix: no edge from %d to %d exists\n", src, dest);
         return graph; // return unchanged graph
