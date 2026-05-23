@@ -41,27 +41,26 @@ typedef struct Graph_list
 {
     int V; // Number of vertices
     int E; // Number of edges
-    // Adjacency list
-    // Array of pointers to arrays (or lists) of adjacent vertices)
-    // NOTE: length of each adjacency list can vary,
-    //       we use adjList[i][0] to store the MEMORY allocated
-    //       we use adjList[i][1] to store the length of the adjacency list
-    //       of vertex i.
-    // Example:
-    // adjList[0] points to an array of vertices adjacent to vertex 0
-    int** adjList;
+    // Adjacency list (weighted)
+    // NOTE:
+    //   - adjList[src] points to an array of edges, each edge is int[2]
+    //   - adjList[src][k][0] is destination vertex
+    //   - adjList[src][k][1] is edge weight
+    //   - adjCapacity[src] stores allocated edge slots for src
+    //   - adjSize[src] stores used edge slots for src
+    int (*(*adjList))[2];
+    int* adjCapacity;
+    int* adjSize;
 } Graph_list;
 /* Graph MATRIX */
 typedef struct Graph_matrix
 {
     int V; // Number of vertices
     int E; // Number of edges
-    // Adjacency matrix
-    // 2D array where matrix[i][j] is 1 if there is an
-    // edge from vertex i to vertex j, otherwise 0
-    // shape: V x V
-    // NOTE: we use char to save some space
-    char** matrix;
+    // Adjacency matrix (weighted)
+    // matrix[i][j] is the edge weight from i to j.
+    // A value of 0 means no edge exists.
+    int** matrix;
 } Graph_matrix;
 
 // =================================================
@@ -76,7 +75,9 @@ static inline Graph_list* create_graph_list(int V)
     graph->V = V;
     graph->E = 0;
     // Allocate memory for adjacency list
-    graph->adjList = (int**)malloc(V * sizeof(int*));
+    graph->adjList = (int (**)[2])malloc(V * sizeof(int (*)[2]));
+    graph->adjCapacity = (int*)calloc(V, sizeof(int));
+    graph->adjSize = (int*)calloc(V, sizeof(int));
     // Initialize all adjacency list pointers to NULL
     for (int i = 0; i < V; ++i)
         graph->adjList[i] = NULL;
@@ -93,6 +94,8 @@ static inline void free_graph_list(Graph_list* graph)
             free(graph->adjList[i]);
     // Free the adjacency list array and the graph structure
     free(graph->adjList);
+    free(graph->adjCapacity);
+    free(graph->adjSize);
     // Free the graph structure itself
     free(graph);
     return;
@@ -119,9 +122,9 @@ static inline int has_edge_list(Graph_list* graph, int src, int dest)
     // Check if dest is in the adjacency list of src
     if (graph->adjList[src] != NULL)
     {
-        for (int i = 0; i < graph->adjList[src][1]; ++i)
+        for (int i = 0; i < graph->adjSize[src]; ++i)
         {
-            if (graph->adjList[src][2 + i] == dest)
+            if (graph->adjList[src][i][0] == dest)
                 return i; // return index of dest in the adjacency list of src
         }
     }
@@ -129,7 +132,7 @@ static inline int has_edge_list(Graph_list* graph, int src, int dest)
     return -1; // return -1 to indicate edge not found
 }
 /* LIST - addition of edge */
-static inline Graph_list* add_edge_list(Graph_list* graph, int src, int dest)
+static inline Graph_list* add_edge_list(Graph_list* graph, int src, int dest, int weight)
 {
     // NOTE: we expand memory allocation by 2 (i.e. 1, 2, 4, 8, ...)
     // NOTE: this is a directed graph, we only add dest to the adjacency list
@@ -146,27 +149,31 @@ static inline Graph_list* add_edge_list(Graph_list* graph, int src, int dest)
         return graph; // return unchanged graph
     }
 
+    // NOTE: 0 is reserved by matrix representation to indicate no edge.
+    if (weight == 0)
+    {
+        printf("[ERROR] add_edge_list: edge weight cannot be 0 (use positive/negative integer)\n");
+        return graph;
+    }
+
     // Check if we have enough space
     if (graph->adjList[src] == NULL)
     {
-        // NOTE:
-        // we use adjList[i][0] to store the MEMORY allocated
-        // we use adjList[i][1] to store the length of the adjacency list
-        graph->adjList[src] = (int*)malloc((2 + 1) * sizeof(int));
+        graph->adjList[src] = (int (*)[2])malloc(1 * sizeof(int[2]));
         // Update allocated space
-        graph->adjList[src][0] = 1; // this is the space of the list to store adjacency vertex (NOT total memory size, does not count first two)
-        graph->adjList[src][1] = 0; // currently nothing inside
+        graph->adjCapacity[src] = 1; // this is the space of the list to store adjacency vertex (NOT total memory size, does not count first two)
+        graph->adjSize[src] = 0; // currently nothing inside
     }
-    else if (graph->adjList[src][1] + 1 > graph->adjList[src][0])
+    else if (graph->adjSize[src] + 1 > graph->adjCapacity[src])
     {
         // Double the capacity
-        int new_capacity = graph->adjList[src][0] * 2;
+        int new_capacity = graph->adjCapacity[src] * 2;
         // Use realloc to resize the existing array efficiently
-        int *new_array = (int*)realloc(graph->adjList[src], (2 + new_capacity) * sizeof(int));
+        int (*new_array)[2] = (int (*)[2])realloc(graph->adjList[src], new_capacity * sizeof(int[2]));
         if (new_array != NULL) 
         {
             graph->adjList[src] = new_array;
-            graph->adjList[src][0] = new_capacity;
+            graph->adjCapacity[src] = new_capacity;
         }
         else
         {
@@ -175,10 +182,11 @@ static inline Graph_list* add_edge_list(Graph_list* graph, int src, int dest)
         }
     }
 
-    // Add dest to the adjacency list of src
-    graph->adjList[src][2 + graph->adjList[src][1]] = dest;
+    // Add edge (dest, weight) to the adjacency list of src
+    graph->adjList[src][graph->adjSize[src]][0] = dest;
+    graph->adjList[src][graph->adjSize[src]][1] = weight;
     // Update length of the adjacency list
-    graph->adjList[src][1] += 1;
+    graph->adjSize[src] += 1;
     // Update number of edges
     graph->E += 1;
 
@@ -210,29 +218,30 @@ static inline Graph_list* remove_edge_list(Graph_list* graph, int src, int dest)
 
     // Remove dest from the adjacency list and
     // swap with the last element to avoid shifting
-    graph->adjList[src][2 + index] = graph->adjList[src][2 + graph->adjList[src][1] - 1];
+    graph->adjList[src][index][0] = graph->adjList[src][graph->adjSize[src] - 1][0];
+    graph->adjList[src][index][1] = graph->adjList[src][graph->adjSize[src] - 1][1];
 
     // Update length of the adjacency list
-    graph->adjList[src][1] -= 1;
+    graph->adjSize[src] -= 1;
 
     // Update number of edges
     graph->E -= 1;
 
     // Check if we should shrink the allocated space
     // if it's 0, we KEEP it as is, DOES NOT SHRINK to 0
-    if (graph->adjList[src][1] > 0 
+    if (graph->adjSize[src] > 0 
         && 
-        graph->adjList[src][1] < graph->adjList[src][0] / 4)
+        graph->adjSize[src] < graph->adjCapacity[src] / 4)
     {
         // Shrink the capacity by half
-        int new_capacity = graph->adjList[src][0] / 2;
+        int new_capacity = graph->adjCapacity[src] / 2;
         // Use realloc to resize the existing array efficiently
         // realloc will keep the existing data and copy it to the new location if needed
-        int *new_array = (int*)realloc(graph->adjList[src], (2 + new_capacity) * sizeof(int));
+        int (*new_array)[2] = (int (*)[2])realloc(graph->adjList[src], new_capacity * sizeof(int[2]));
         if (new_array != NULL) 
         {
             graph->adjList[src] = new_array;
-            graph->adjList[src][0] = new_capacity;
+            graph->adjCapacity[src] = new_capacity;
         }
         else
         {
@@ -255,8 +264,8 @@ static inline void print_graph_list(Graph_list* graph)
     {
         printf("  [Vertex %2d]: ", i);
         if (graph->adjList[i] != NULL)
-            for (int j = 0; j < graph->adjList[i][1]; ++j)
-                printf("%2d ", graph->adjList[i][2 + j]);
+            for (int j = 0; j < graph->adjSize[i]; ++j)
+                printf("(%2d,w=%2d) ", graph->adjList[i][j][0], graph->adjList[i][j][1]);
         printf("\n");
     }
     return;
@@ -270,9 +279,9 @@ static inline Graph_matrix* create_graph_matrix(int V)
     graph->V = V;
     graph->E = 0;
     // Allocate memory for adjacency matrix
-    graph->matrix = (char**)malloc(V * sizeof(char*));
+    graph->matrix = (int**)malloc(V * sizeof(int*));
     for (int i = 0; i < V; ++i)
-        graph->matrix[i] = (char*)malloc(V * sizeof(char));
+        graph->matrix[i] = (int*)malloc(V * sizeof(int));
     // Initialize the adjacency matrix to 0
     // NO INITIAL EDGES
     for (int i = 0; i < V; ++i)
@@ -309,11 +318,11 @@ static inline int has_edge_matrix(Graph_matrix* graph, int src, int dest)
     }
 
     // Return the value at the intersection of the two vertices
-    // NOTE: this will return 1 if there is an edge, and 0 if there is no edge
-    return graph->matrix[src][dest];
+    // NOTE: this returns 1 if there is an edge, and 0 if there is no edge
+    return graph->matrix[src][dest] != 0;
 }
 /* MATRIX - addition of edge */
-static inline Graph_matrix* add_edge_matrix(Graph_matrix* graph, int src, int dest)
+static inline Graph_matrix* add_edge_matrix(Graph_matrix* graph, int src, int dest, int weight)
 {
     // ERROR checking (for src and dest we use 0-indexing) -> checked in has_edge_matrix
     // ERROR checking (parallel edge NOT allowed)
@@ -323,8 +332,15 @@ static inline Graph_matrix* add_edge_matrix(Graph_matrix* graph, int src, int de
         return graph; // return unchanged graph
     }
 
-    // Set the value at the intersection of the two vertices to 1
-    graph->matrix[src][dest] = 1;
+    // NOTE: 0 is reserved by matrix representation to indicate no edge.
+    if (weight == 0)
+    {
+        printf("[ERROR] add_edge_matrix: edge weight cannot be 0 (0 means no edge)\n");
+        return graph;
+    }
+
+    // Set the value at the intersection of the two vertices to edge weight
+    graph->matrix[src][dest] = weight;
     // Update number of edges
     graph->E += 1;
     // Return the updated graph
@@ -352,7 +368,7 @@ static inline Graph_matrix* remove_edge_matrix(Graph_matrix* graph, int src, int
 static inline void print_graph_matrix(Graph_matrix* graph)
 {
     // Print the graph in adjacency matrix format
-    printf("Graph (Adjacency Matrix):\n");
+    printf("Graph (Adjacency Matrix) - numbers are weights (0 means no edge):\n");
     printf("%6c", ' ');
     // Print column headers
     for (int j = 0; j < graph->V; ++j)
@@ -376,9 +392,9 @@ static inline Graph_list* matrix_to_list(Graph_matrix* graph)
     // Iterate through the adjacency matrix and populate the adjacency list
     for (int i = 0; i < graph->V; ++i)
         for (int j = 0; j < graph->V; ++j)
-            if (graph->matrix[i][j] == 1)
+            if (graph->matrix[i][j] != 0)
                 // Add edge from vertex i to vertex j in the new graph
-                add_edge_list(new_graph, i, j);
+                add_edge_list(new_graph, i, j, graph->matrix[i][j]);
 
     // Assert that the number of edges is the same
     if (new_graph->E != graph->E)
@@ -396,11 +412,12 @@ static inline Graph_matrix* list_to_matrix(Graph_list* graph)
     // Iterate through the adjacency list and populate the adjacency matrix
     for (int i = 0; i < graph->V; ++i)
         if (graph->adjList[i] != NULL)
-            for (int j = 0; j < graph->adjList[i][1]; ++j)
+            for (int j = 0; j < graph->adjSize[i]; ++j)
             {
-                int dest = graph->adjList[i][2 + j];
+                int dest = graph->adjList[i][j][0];
+                int weight = graph->adjList[i][j][1];
                 // Add edge from vertex i to vertex dest in the new graph
-                add_edge_matrix(new_graph, i, dest);
+                add_edge_matrix(new_graph, i, dest, weight);
             }
     
     // Assert that the number of edges is the same
