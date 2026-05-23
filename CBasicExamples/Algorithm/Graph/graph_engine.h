@@ -289,7 +289,7 @@ static inline Graph_matrix* create_graph_matrix(int V)
 {
     // PRINT WARNING: no 0 weight edges for matrix representation
     printf("[WARNING] create_graph_matrix: no 0 weight edges for matrix representation (0 means no edge), if you need 0 weights, you can use list representation\n");
-    
+
     // create structure container
     Graph_matrix * graph = (Graph_matrix*)malloc(sizeof(Graph_matrix));
     // Initialize adjacency matrix structure members
@@ -498,7 +498,9 @@ static inline Graph_tree* create_graph_tree(int root_vertex)
     root->children = NULL;
     root->num_children = 0;
     root->child_capacity = 0;
-    root->parent = NULL;
+    root->parent = root; // we set this to itself (for Kruskal)
+
+    // set the root of the tree
     tree->root = root;
 
     // return the newly created tree
@@ -622,7 +624,7 @@ static inline Graph_tree* remove_tree_node(Graph_tree* tree, int vertex)
     if (!target) { printf("[ERROR] remove_tree_node: vertex %d not found\n", vertex); return tree; }
 
     /* If target is root, free whole tree and return NULL */
-    if (target->parent == NULL)
+    if (target->parent == target) // this means target is root (we set root's parent to itself)
     {
         free_graph_tree(tree);
         return NULL;
