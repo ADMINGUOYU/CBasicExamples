@@ -48,15 +48,21 @@ int alg_graph_traversal_main(int argc, char* argv[])
     add_edge_undirected_list(graph, 7, 9, 1);
     add_edge_undirected_list(graph, 8, 9, 1);
 
+    // convert a set of adjacency matrix
+    Graph_matrix* graph_matrix = list_to_matrix(graph);
+
     // Perform BFS and DFS traversals
     Graph_tree* bfs_tree = bfs_traversal_list(graph, 0); // BFS starting from vertex 0
     Graph_tree* dfs_tree = dfs_traversal_list(graph, 0); // DFS starting from vertex 0
 
     // Print results
-    printf("\033[1;32m>>> Graph Traversal (Results) <<<\033[0m\n");
+    printf("\033[1;32m>>> Graph Traversal (Results) >>>\033[0m\n");
     // print the adjacency list of the original graph
     printf("\033[1;34mOriginal Graph (Adjacency List):\033[0m\n");
     print_graph_list(graph);
+    // print the adjacency matrix of the original graph
+    printf("\033[1;34mOriginal Graph (Adjacency Matrix):\033[0m\n");
+    print_graph_matrix(graph_matrix);
     // print the BFS tree
     printf("\033[1;34mBFS Tree:\033[0m\n");
     print_graph_tree(bfs_tree);
@@ -66,6 +72,7 @@ int alg_graph_traversal_main(int argc, char* argv[])
 
     // Clean up
     free_graph_list(graph);
+    free_graph_matrix(graph_matrix);
     free_graph_tree(bfs_tree);
     free_graph_tree(dfs_tree);
 
