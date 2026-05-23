@@ -553,6 +553,16 @@ static inline Graph_tree_node* find_tree_node(Graph_tree* tree, int vertex)
     // find on its root recursively
     return find_tree_node_recursively(tree->root, vertex);
 }
+/* Find root of a node*/
+static inline Graph_tree_node* find_tree_root(Graph_tree_node* node)
+{
+    // if node is NULL, return NULL
+    if (!node) return NULL;
+    // if node is root (parent points to itself), return it
+    if (node->parent == node) return node;
+    // otherwise, recursively find the root
+    return find_tree_root(node->parent);
+}
 /*
    Add a new node with new_vertex as child of parent_vertex.
    Returns pointer to newly created node or NULL on error.
