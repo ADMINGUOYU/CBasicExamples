@@ -282,7 +282,7 @@ static inline Graph_matrix* create_graph_matrix(int V)
     return graph;
 }
 /* MATRIX - destruction */
-static void free_graph_matrix(Graph_matrix* graph)
+static inline void free_graph_matrix(Graph_matrix* graph)
 {
     // NOTE: the passed graph will be invalid after this function
 
