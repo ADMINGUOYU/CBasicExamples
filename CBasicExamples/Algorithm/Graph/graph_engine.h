@@ -202,6 +202,14 @@ static inline Graph_list* add_edge_list(Graph_list* graph, int src, int dest, in
     // Return the updated graph
     return graph;  
 }
+/* LIST - addition of edge (no direction) -> TWO directed edges */
+static inline Graph_list* add_edge_undirected_list(Graph_list* graph, int src, int dest, int weight)
+{
+    // Add the edge in both directions
+    add_edge_list(graph, src, dest, weight);
+    add_edge_list(graph, dest, src, weight);
+    return graph;
+}
 /* LIST - removal of edge */
 static inline Graph_list* remove_edge_list(Graph_list* graph, int src, int dest)
 {
@@ -370,6 +378,14 @@ static inline Graph_matrix* add_edge_matrix(Graph_matrix* graph, int src, int de
     // Update number of edges
     graph->E += 1;
     // Return the updated graph
+    return graph;
+}
+/* MATRIX - addition of edge (undirected) */
+static inline Graph_matrix* add_edge_undirected_matrix(Graph_matrix* graph, int src, int dest, int weight)
+{
+    // Add the edge in both directions
+    add_edge_matrix(graph, src, dest, weight);
+    add_edge_matrix(graph, dest, src, weight);
     return graph;
 }
 /* MATRIX - removal of edge */
@@ -695,6 +711,206 @@ static inline void print_graph_tree(Graph_tree* tree)
     if (!tree) { printf("[Graph Tree] (null)\n"); return; }
     printf("Graph Tree (root = %d):\n", tree->root ? tree->root->vertex : -1);
     if (tree->root) print_tree_node_recursively(tree->root, 0);
+}
+
+// =================================================
+// Graph traversal functions (BFS and DFS)
+// =================================================
+/* BFS traversal on list representation, returns traversal tree */
+static inline Graph_tree* bfs_traversal_list(Graph_list* graph, int start_vertex)
+{
+    // NOTE: simple circular queue implemented locally (fixed capacity = graph->V)
+
+    // ERROR checking: graph should not be NULL, start_vertex should be valid
+    if (!graph) { printf("[ERROR] bfs_traversal_list: graph is NULL\n"); return NULL; }
+    if (start_vertex < 0 || start_vertex >= graph->V)
+    {
+        printf("[ERROR] bfs_traversal_list: 'start_vertex' should be within [0, %d)\n", graph->V);
+        return NULL;
+    }
+
+    // create a traversal tree with start_vertex as root
+    Graph_tree* tree = create_graph_tree(start_vertex);
+    // Error checking for tree creation
+    if (!tree) return NULL;
+
+    // create a visited array to track visited vertices
+    int* visited = (int*)calloc(graph->V, sizeof(int));
+    if (!visited)
+    {
+        printf("[ERROR] bfs_traversal_list: calloc failed\n");
+        free_graph_tree(tree);
+        return NULL;
+    }
+
+    // simple circular queue (capacity = graph->V)
+    int q_capacity = graph->V; // it should always > 0
+    int* queue = (int*)malloc(q_capacity * sizeof(int));
+    if (!queue)
+    {
+        printf("[ERROR] bfs_traversal_list: malloc failed for queue\n");
+        free(visited);
+        free_graph_tree(tree);
+        return NULL;
+    }
+
+    // queue front and rear indices, and current size
+    int q_front = 0;
+    int q_rear = 0;
+    int q_size = 0;
+
+    // start BFS traversal from start_vertex
+    // mark it as visited
+    visited[start_vertex] = 1;
+    // enqueue start_vertex
+    queue[q_rear] = start_vertex;
+    // update rear and size
+    q_rear = (q_rear + 1) % q_capacity;
+    q_size += 1;
+
+    // Loop until the queue is empty
+    while (q_size > 0)
+    {
+        // dequeue
+        int current = queue[q_front];
+        // update front and size
+        q_front = (q_front + 1) % q_capacity;
+        q_size -= 1;
+
+        // for each neighbor of the current vertex, if it has not been visited,
+        // we add it to the tree and enqueue it
+        if (graph->adjList[current] != NULL)
+            for (int i = 0; i < graph->adjSize[current]; ++i)
+            {
+                // get the next vertex from the adjacency list
+                int next = graph->adjList[current][i][0];
+                // if it has not been visited, we add it to the tree and enqueue it
+                if (!visited[next])
+                {
+                    // mark it as visited
+                    visited[next] = 1;
+                    // add it to the tree as a child of current
+                    if (!add_tree_node(tree, current, next))
+                    {
+                        free(queue);
+                        free(visited);
+                        free_graph_tree(tree);
+                        return NULL;
+                    }
+                    // enqueue next (queue capacity == graph->V, should not overflow in BFS)
+                    if (q_size >= q_capacity)
+                    {
+                        // unexpected overflow, abort safely
+                        printf("[ERROR] bfs_traversal_list: unexpected queue overflow\n");
+                        free(queue);
+                        free(visited);
+                        free_graph_tree(tree);
+                        return NULL;
+                    }
+                    // enqueue next
+                    queue[q_rear] = next;
+                    q_rear = (q_rear + 1) % q_capacity;
+                    q_size += 1;
+                }
+            }
+    }
+
+    // cleanup
+    free(queue);
+    free(visited);
+
+    // return the traversal tree
+    return tree;
+}
+/* DFS traversal on list representation, returns traversal tree */
+static inline Graph_tree* dfs_traversal_list(Graph_list* graph, int start_vertex)
+{
+    // ERROR checking: graph should not be NULL, start_vertex should be valid
+    if (!graph) { printf("[ERROR] dfs_traversal_list: graph is NULL\n"); return NULL; }
+    if (start_vertex < 0 || start_vertex >= graph->V)
+    {
+        printf("[ERROR] dfs_traversal_list: 'start_vertex' should be within [0, %d)\n", graph->V);
+        return NULL;
+    }
+
+    // NOTE: we use a stack to track the vertices to visit,
+    //       and we use a visited array to track visited vertices to avoid cycles
+
+    // create a traversal tree with start_vertex as root
+    Graph_tree* tree = create_graph_tree(start_vertex);
+    if (!tree) return NULL;
+
+    // create a visited array to track visited vertices
+    int* visited = (int*)calloc(graph->V, sizeof(int));
+
+    // We can implement the stack using two parallel arrays:
+    // one for vertices and one for the next adjacency index to explore for each vertex
+    int* stack_vertices = (int*)malloc(graph->V * sizeof(int));
+    int* stack_next_adj_idx = (int*)malloc(graph->V * sizeof(int));
+    if (!visited || !stack_vertices || !stack_next_adj_idx)
+    {
+        printf("[ERROR] dfs_traversal_list: memory allocation failed\n");
+        if (visited) free(visited);
+        if (stack_vertices) free(stack_vertices);
+        if (stack_next_adj_idx) free(stack_next_adj_idx);
+        free_graph_tree(tree);
+        return NULL;
+    }
+
+    // start DFS traversal from start_vertex
+    int top = 0;
+    visited[start_vertex] = 1;
+    stack_vertices[top] = start_vertex;
+    stack_next_adj_idx[top] = 0;
+
+    while (top >= 0)
+    {
+        // get the current vertex from the top of the stack
+        int current = stack_vertices[top];
+
+        // if no list or no more neighbor to process, pop
+        if (graph->adjList[current] == NULL
+            ||
+            stack_next_adj_idx[top] >= graph->adjSize[current])
+        {
+            // return to backtrack
+            top -= 1;
+            continue;
+        }
+
+        // get the next vertex from the adjacency list
+        int next = graph->adjList[current][stack_next_adj_idx[top]][0];
+        // increment the next adjacency index for the current vertex
+        stack_next_adj_idx[top] += 1;
+
+        // if visited, we skip it
+        if (!visited[next])
+        {
+            // mark it as visited
+            visited[next] = 1;
+            // add it to the tree as a child of current
+            if (!add_tree_node(tree, current, next))
+            {
+                free(visited);
+                free(stack_vertices);
+                free(stack_next_adj_idx);
+                free_graph_tree(tree);
+                return NULL;
+            }
+            // push it to the stack for further exploration (depth first)
+            top += 1;
+            stack_vertices[top] = next;
+            stack_next_adj_idx[top] = 0;
+        }
+    }
+
+    // cleanup
+    free(visited);
+    free(stack_vertices);
+    free(stack_next_adj_idx);
+
+    // return the traversal tree
+    return tree;
 }
 
 #endif // _ALG_GRAPH_ENGINE_H_
