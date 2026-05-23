@@ -30,6 +30,7 @@
 #include "Algorithm/Greedy/huffman.h"
 #include "Algorithm/Greedy/wifi_tower.h"
 #include "Algorithm/Graph/graph_representation.h"
+#include "Algorithm/Graph/graph_traversal.h"
 
 char* programList[] = {
     "Hello World", 
@@ -58,7 +59,8 @@ char* programList[] = {
     "Algorithm: Dynamic Programming - [INTERVAL] Longest Palindromic Substring",
     "Algorithm: Greedy - Huffman Coding",
     "Algorithm: Greedy - WiFi Tower Placement",
-    "Algorithm: Graph - Adjacency Matrix/List Representation"
+    "Algorithm: Graph - Adjacency Matrix/List Representation",
+    "Algorithm: Graph - Traversal (BFS and DFS)"
 };
 int (*programFunc[])(int argc, char** argv) = {
     helloWorldMain, 
@@ -87,7 +89,8 @@ int (*programFunc[])(int argc, char** argv) = {
     alg_dp_int_longest_palindromic_substring_main,
     alg_greedy_huffman_main,
     alg_greedy_wifi_tower_main,
-    alg_graph_representation_main
+    alg_graph_representation_main,
+    alg_graph_traversal_main
 };
 
 // Define the program count
