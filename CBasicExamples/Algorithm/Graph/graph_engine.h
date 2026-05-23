@@ -972,6 +972,7 @@ static inline Graph_tree* dfs_traversal_list(Graph_list* graph, int start_vertex
 
 // =================================================
 // Minimum Spanning Tree (MST) algorithms
+// UNDIRECTED graphs only
 // =================================================
 /* Prim's MST on list representation */
 static inline Graph_tree* prim_mst_list(Graph_list* graph, int start_vertex)
@@ -980,11 +981,19 @@ static inline Graph_tree* prim_mst_list(Graph_list* graph, int start_vertex)
     // NOTE: we use brute force linear scan to extract-min
     // just for demonstration purpose
 
+    // PRINT WARNING FOR UNDIRECTED GRAPH
+    printf("[WARNING] prim_mst_list: this function assumes the input graph is undirected, if it's directed, the result may not be a valid MST.\n");
+
     // ERROR checking: graph should not be NULL and should have at least 1 vertex
     if (!graph) { printf("[ERROR] prim_mst_list: graph is NULL\n"); return NULL; }
     if (graph->V <= 0)
     {
         printf("[ERROR] prim_mst_list: graph should have at least 1 vertex\n");
+        return NULL;
+    }
+    if (start_vertex < 0 || start_vertex >= graph->V)
+    {
+        printf("[ERROR] prim_mst_list: start_vertex should be within [0, %d)\n", graph->V);
         return NULL;
     }
 
@@ -1092,6 +1101,277 @@ static inline Graph_tree* prim_mst_list(Graph_list* graph, int start_vertex)
     // cleanup and return
     free(pq);
     free(in_mst);
+    return tree;
+}
+/* Kruskal's MST on list representation */
+static inline Graph_tree* kruskal_mst_list(Graph_list* graph, int start_vertex)
+{
+    // NOTE: we used brute force sorting and union-find without optimizations
+    //       just for demonstration purpose
+
+    // PRINT WARNING FOR UNDIRECTED GRAPH
+    printf("[WARNING] kruskal_mst_list: this function assumes the input graph is undirected, if it's directed, the result may not be a valid MST.\n");
+
+    // ERROR checking: graph should not be NULL and should have at least 1 vertex
+    if (!graph) { printf("[ERROR] kruskal_mst_list: graph is NULL\n"); return NULL; }
+    if (graph->V <= 0)
+    {
+        printf("[ERROR] kruskal_mst_list: graph should have at least 1 vertex\n");
+        return NULL;
+    }
+    if (start_vertex < 0 || start_vertex >= graph->V)
+    {
+        printf("[ERROR] kruskal_mst_list: start_vertex should be within [0, %d)\n", graph->V);
+        return NULL;
+    }
+
+    // create MST tree with the specified start vertex as root
+    Graph_tree* tree = create_graph_tree(start_vertex);
+    if (!tree) return NULL;
+
+    // gather all edges into an array: [from, to, weight]
+    int edge_capacity = (graph->E > 0) ? graph->E : 1;
+    int (*edges)[3] = (int (*)[3])malloc(edge_capacity * sizeof(int[3]));
+    if (!edges)
+    {
+        printf("[ERROR] kruskal_mst_list: malloc failed for edge array\n");
+        free_graph_tree(tree);
+        return NULL;
+    }
+
+    // we loop through the adjacency list and gather all edges
+    // NOTE: if undirected graph,
+    //       we will have both (u, v) and (v, u) in the adjacency list,
+    //       we will gather both as separate edges,
+    //       but it does not affect the correctness of Kruskal's algorithm
+    //       since they have the same weight and connect the same two vertices
+    //       we'll exclude it when checking for cycles
+    int edge_count = 0;
+    for (int from = 0; from < graph->V; ++from)
+        if (graph->adjList[from] != NULL)
+            for (int j = 0; j < graph->adjSize[from]; ++j)
+            {
+                if (edge_count >= edge_capacity)
+                {
+                    // this should not happen if graph->E is accurate
+                    printf("[ERROR] kruskal_mst_list: unexpected edge array overflow\n");
+                    free(edges);
+                    free_graph_tree(tree);
+                    return NULL;
+                }
+                // set up the edge as [from, to, weight]
+                edges[edge_count][0] = from;
+                edges[edge_count][1] = graph->adjList[from][j][0];
+                edges[edge_count][2] = graph->adjList[from][j][1];
+                edge_count += 1;
+            }
+
+    // sort edges by weight (ascending) using insertion sort
+    // NOTE: brute force -> O(E^2) time
+    for (int i = 1; i < edge_count; ++i)
+    {
+        int key_from = edges[i][0];
+        int key_to = edges[i][1];
+        int key_weight = edges[i][2];
+        int j = i - 1;
+        while (j >= 0 && edges[j][2] > key_weight)
+        {
+            edges[j + 1][0] = edges[j][0];
+            edges[j + 1][1] = edges[j][1];
+            edges[j + 1][2] = edges[j][2];
+            j -= 1;
+        }
+        edges[j + 1][0] = key_from;
+        edges[j + 1][1] = key_to;
+        edges[j + 1][2] = key_weight;
+    }
+
+    // union-find arrays (make-set/find-set/union-set in-function only)
+    // parent[i] is the parent of vertex i in the union-find structure
+    // rank[i] is the rank of the tree rooted at vertex i (used for union by rank)
+    int* parent = (int*)malloc(graph->V * sizeof(int));
+    int* rank = (int*)calloc(graph->V, sizeof(int)); // init all to 0
+    if (!parent || !rank)
+    {
+        printf("[ERROR] kruskal_mst_list: malloc/calloc failed for union-find arrays\n");
+        if (parent) free(parent);
+        if (rank) free(rank);
+        free(edges);
+        free_graph_tree(tree);
+        return NULL;
+    }
+    for (int i = 0; i < graph->V; ++i) parent[i] = i; // make-set
+
+    // store selected MST edges as [u, v]
+    // selected_edges[i][0] is u, selected_edges[i][1] is v
+    // At most we have V - 1 edges selected for MST
+    int selected_capacity = (graph->V > 1) ? (graph->V - 1) : 1;
+    int (*selected_edges)[2] = (int (*)[2])malloc(selected_capacity * sizeof(int[2]));
+    if (!selected_edges)
+    {
+        printf("[ERROR] kruskal_mst_list: malloc failed for selected edge array\n");
+        free(parent);
+        free(rank);
+        free(edges);
+        free_graph_tree(tree);
+        return NULL;
+    }
+    int selected_count = 0;
+
+    // Kruskal: scan sorted edges and keep edges that connect two different sets
+    // LOOP all edges
+    for (int i = 0; i < edge_count && selected_count < graph->V - 1; ++i)
+    {
+        // get start and end vertices of the edge
+        int u = edges[i][0];
+        int v = edges[i][1];
+
+        // find-set(u) with path compression
+        int root_u = u; // root of the set containing u
+        while (parent[root_u] != root_u) root_u = parent[root_u];
+        int walk_u = u; // walk variable to perform path compression for u
+        while (parent[walk_u] != walk_u)
+        {
+            // we suppress all nodes along the path to point to the ultimate parent
+            int next = parent[walk_u];
+            parent[walk_u] = root_u;
+            walk_u = next;
+        }
+
+        // find-set(v) with path compression
+        int root_v = v;
+        while (parent[root_v] != root_v) root_v = parent[root_v];
+        int walk_v = v;
+        while (parent[walk_v] != walk_v)
+        {
+            int next = parent[walk_v];
+            parent[walk_v] = root_v;
+            walk_v = next;
+        }
+
+        // if roots differ, keep this edge and union the two sets
+        if (root_u != root_v)
+        {
+            // add this edge to selected edges
+            selected_edges[selected_count][0] = u;
+            selected_edges[selected_count][1] = v;
+            selected_count += 1;
+
+            // union by rank -> lesser walk time (optimization)
+            // NOTE: why we don't increase rank when ranks are different?
+            //       because the tree with smaller rank is attached under the
+            //       one with larger rank, so the rank of the resulting tree
+            //       does not increase in this case (stays with the larger tree)
+            if (rank[root_u] < rank[root_v])
+                parent[root_u] = root_v;
+            else if (rank[root_u] > rank[root_v])
+                parent[root_v] = root_u;
+            else
+            {
+                // if ranks are equal, we can choose either one as new root,
+                // here we choose root_u
+                parent[root_v] = root_u;
+                rank[root_u] += 1;
+            }
+        }
+        else // if roots are the same, this edge would form a cycle, we skip it
+            continue;
+    }
+
+    // Build a rooted tree from selected undirected MST edges, starting at start_vertex.
+    // We repeatedly attach a new vertex when exactly one endpoint is already in the tree.
+    int* in_tree = (int*)calloc(graph->V, sizeof(int));
+    if (!in_tree)
+    {
+        printf("[ERROR] kruskal_mst_list: calloc failed for in_tree array\n");
+        free(selected_edges);
+        free(parent);
+        free(rank);
+        free(edges);
+        free_graph_tree(tree);
+        return NULL;
+    }
+    // we start with the specified vertex in the tree
+    in_tree[start_vertex] = 1;
+
+    // NOW, we have to build our tree from pieces of edges
+    // we loop until no more edge can be attached,
+    // in the worst case we attach V - 1 edges (if connected)
+    int attached_edges = 0;
+    int progress = 1;   // flag, finally becomes 0 when we cannot attach any more edge
+    while (progress)
+    {
+        progress = 0;
+        // loop all selected edges
+        // This loop will run MANY MANY times to attach all edges
+        for (int i = 0; i < selected_count; ++i)
+        {
+            // get the two endpoints of the edge
+            int a = selected_edges[i][0];
+            int b = selected_edges[i][1];
+            // if exactly one endpoint is in the tree,
+            // we can attach the other endpoint to the tree
+            if (in_tree[a] && !in_tree[b])
+            {
+                if (!add_tree_node(tree, a, b))
+                {
+                    free(in_tree);
+                    free(selected_edges);
+                    free(parent);
+                    free(rank);
+                    free(edges);
+                    free_graph_tree(tree);
+                    return NULL;
+                }
+                // make b in tree too
+                in_tree[b] = 1;
+                attached_edges += 1;
+                // we mark that we added something
+                progress = 1;
+            }
+            // we also check the other direction since the edge is undirected,
+            // we can attach a to b if b is in the tree but a is not in the tree
+            else if (!in_tree[a] && in_tree[b])
+            {
+                if (!add_tree_node(tree, b, a))
+                {
+                    free(in_tree);
+                    free(selected_edges);
+                    free(parent);
+                    free(rank);
+                    free(edges);
+                    free_graph_tree(tree);
+                    return NULL;
+                }
+                // make a in tree too
+                in_tree[a] = 1;
+                attached_edges += 1;
+                // we mark that we added something
+                progress = 1;
+            }
+            else
+            {
+                // either both endpoints are already in the tree (should not happen in a tree)
+                // or both endpoints are not in the tree (we cannot attach this edge yet)
+                // in either case, we skip this edge for now
+                continue;
+            }
+        }
+    }
+
+    // if graph is disconnected, we only get component reachable from start_vertex
+    printf("[DEBUG] kruskal_mst_list: selected_edges = %d\n", selected_count);
+    if (attached_edges != graph->V - 1)
+        printf("[WARNING] kruskal_mst_list: graph may be disconnected, MST covers reachable component from root %d\n", start_vertex);
+
+    // cleanup and return
+    free(in_tree);
+    free(selected_edges);
+    free(parent);
+    free(rank);
+    free(edges);
+
+    // return the MST tree
     return tree;
 }
 

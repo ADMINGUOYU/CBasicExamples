@@ -31,6 +31,7 @@
 #include "Algorithm/Greedy/wifi_tower.h"
 #include "Algorithm/Graph/graph_representation.h"
 #include "Algorithm/Graph/graph_traversal.h"
+#include "Algorithm/Graph/graph_mst.h"
 
 char* programList[] = {
     "Hello World", 
@@ -60,7 +61,8 @@ char* programList[] = {
     "Algorithm: Greedy - Huffman Coding",
     "Algorithm: Greedy - WiFi Tower Placement",
     "Algorithm: Graph - Adjacency Matrix/List Representation",
-    "Algorithm: Graph - Traversal (BFS and DFS)"
+    "Algorithm: Graph - Traversal (BFS and DFS)",
+    "Algorithm: Graph - Minimum Spanning Tree (MST)"
 };
 int (*programFunc[])(int argc, char** argv) = {
     helloWorldMain, 
@@ -90,7 +92,8 @@ int (*programFunc[])(int argc, char** argv) = {
     alg_greedy_huffman_main,
     alg_greedy_wifi_tower_main,
     alg_graph_representation_main,
-    alg_graph_traversal_main
+    alg_graph_traversal_main,
+    alg_graph_mst_main
 };
 
 // Define the program count
