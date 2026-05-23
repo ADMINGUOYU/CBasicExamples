@@ -36,10 +36,11 @@ Including:
 // =================================================
 // Define ERRORS (ERRORs are ALL NEGATIVE numbers)
 // =================================================
-// Value error
-#define VALUE_ERROR INT_MIN
-// Not found error
-#define NOT_FOUND_ERROR -1
+typedef enum Graph_error
+{
+    VALUE_ERROR = INT_MIN, // value error (e.g. invalid vertex index)
+    NOT_FOUND_ERROR = -1   // not found error (e.g. edge not found)
+} Graph_error;
 
 // =================================================
 // Define of graph representations
@@ -67,7 +68,8 @@ typedef struct Graph_matrix
     int E; // Number of edges
     // Adjacency matrix (weighted)
     // matrix[i][j] is the edge weight from i to j.
-    // A value of 0 means no edge exists.
+    // A value of 0 means no edge exists,
+    // if you need 0 weights, you can use list representation.
     int** matrix;
 } Graph_matrix;
 
@@ -161,13 +163,6 @@ static inline Graph_list* add_edge_list(Graph_list* graph, int src, int dest, in
     {
         printf("[ERROR] add_edge_list: parallel edge from %d to %d is NOT allowed\n", src, dest);
         return graph; // return unchanged graph
-    }
-
-    // NOTE: 0 is reserved by matrix representation to indicate no edge.
-    if (weight == 0)
-    {
-        printf("[ERROR] add_edge_list: edge weight cannot be 0 (use positive/negative integer)\n");
-        return graph;
     }
 
     // Check if we have enough space
@@ -267,7 +262,7 @@ static inline Graph_list* remove_edge_list(Graph_list* graph, int src, int dest)
             // NOTE: if shrinking fails, we can still keep the existing array, 
             //       just with more allocated space than needed, this is not a critical error
             printf("[ERROR] remove_edge_list: Memory reallocation failed during shrinking\n");
-            return graph;
+            // we can still continue
         }
     }
 
@@ -292,6 +287,9 @@ static inline void print_graph_list(Graph_list* graph)
 /* MATRIX - creation */
 static inline Graph_matrix* create_graph_matrix(int V)
 {
+    // PRINT WARNING: no 0 weight edges for matrix representation
+    printf("[WARNING] create_graph_matrix: no 0 weight edges for matrix representation (0 means no edge), if you need 0 weights, you can use list representation\n");
+    
     // create structure container
     Graph_matrix * graph = (Graph_matrix*)malloc(sizeof(Graph_matrix));
     // Initialize adjacency matrix structure members
@@ -462,5 +460,229 @@ static inline Graph_matrix* list_to_matrix(Graph_list* graph)
     return new_graph;
 }
 
+// =================================================
+// Define of TREE representations (for traversals)
+// =================================================
+/* Tree Node */
+typedef struct Graph_tree_node
+{
+    // the vertex this node represents (this is the KEY)
+    int vertex;
+    /* For tree saving children */
+    struct Graph_tree_node** children; // array of pointers to child nodes
+    int num_children;                  // number of child nodes
+    int child_capacity;                // allocated capacity for children array
+    /* For trees tracking of its parent - used in MST Kruskal */
+    struct Graph_tree_node* parent;    // pointer to parent node
+} Graph_tree_node;
+/* Tree */
+typedef struct Graph_tree
+{
+    Graph_tree_node* root;
+} Graph_tree;
+
+// =================================================
+// Define of TREE functions
+// =================================================
+/* Create a tree with a root node (vertex as key) */
+static inline Graph_tree* create_graph_tree(int root_vertex)
+{
+    // allocate memory for the tree structure and the root node
+    Graph_tree* tree = (Graph_tree*)malloc(sizeof(Graph_tree));
+    if (!tree) { printf("[ERROR] create_graph_tree: malloc failed\n"); return NULL; }
+    Graph_tree_node* root = (Graph_tree_node*)malloc(sizeof(Graph_tree_node));
+    if (!root) { printf("[ERROR] create_graph_tree: malloc failed\n"); free(tree); return NULL; }
+    
+    // initialize the root node
+    root->vertex = root_vertex;
+    root->children = NULL;
+    root->num_children = 0;
+    root->child_capacity = 0;
+    root->parent = NULL;
+    tree->root = root;
+
+    // return the newly created tree
+    return tree;
+}
+/* Recursively free a subtree rooted at node */
+static inline void free_tree_node_recursively(Graph_tree_node* node)
+{
+    // base case - if node is NULL, just return
+    if (!node) return;
+    // recursively free all children
+    for (int i = 0; i < node->num_children; ++i)
+        free_tree_node_recursively(node->children[i]);
+    // free the children array and the node itself
+    if (node->children) free(node->children);
+    free(node);
+}
+/* Free entire tree */
+static inline void free_graph_tree(Graph_tree* tree)
+{
+    // NOTE: the passed tree will be invalid after this function
+    // if tree is NULL, just return
+    if (!tree) return;
+    // recursively free the whole tree starting from the root
+    free_tree_node_recursively(tree->root);
+    // free the tree structure itself
+    free(tree);
+}
+/* Recursively find node by vertex key */
+static inline Graph_tree_node* find_tree_node_recursively(Graph_tree_node* node, int vertex)
+{
+    // base case - if node is NULL, return NULL
+    if (!node) return NULL;
+    // if the current node matches the vertex, return it
+    if (node->vertex == vertex) return node;
+    // recursively search in the children (depth first strategy)
+    for (int i = 0; i < node->num_children; ++i)
+    {
+        // call recursively on the child node
+        Graph_tree_node* found = find_tree_node_recursively(node->children[i], vertex);
+        if (found) return found;
+    }
+    return NULL;
+}
+/* Find node in tree by vertex key */
+static inline Graph_tree_node* find_tree_node(Graph_tree* tree, int vertex)
+{
+    // if tree is NULL, just return NULL
+    if (!tree) return NULL;
+    // find on its root recursively
+    return find_tree_node_recursively(tree->root, vertex);
+}
+/*
+   Add a new node with new_vertex as child of parent_vertex.
+   Returns pointer to newly created node or NULL on error.
+*/
+static inline Graph_tree_node* add_tree_node(Graph_tree* tree, int parent_vertex, int new_vertex)
+{
+    // NOTE: We enlarge the children array of the parent node by 2 (i.e. 1, 2, 4, 8, ...)
+
+    // ERROR checking: tree should not be NULL, 
+    // parent_vertex should exist
+    if (!tree) { printf("[ERROR] add_tree_node: tree is NULL\n"); return NULL; }
+    Graph_tree_node* parent = find_tree_node(tree, parent_vertex);
+    if (!parent) { printf("[ERROR] add_tree_node: parent %d not found\n", parent_vertex); return NULL; }
+    // ERROR checking: new_vertex should not already exist in the tree
+    // it should be acyclic, so we check if new_vertex already exists in the tree
+    if (find_tree_node(tree, new_vertex))
+    {
+        printf("[ERROR] add_tree_node: vertex %d already exists in the tree\n", new_vertex);
+        return NULL;
+    }
+
+    // Create the new child node
+    Graph_tree_node* child = (Graph_tree_node*)malloc(sizeof(Graph_tree_node));
+    if (!child) { printf("[ERROR] add_tree_node: malloc failed\n"); return NULL; }
+    child->vertex = new_vertex;
+    child->children = NULL;
+    child->num_children = 0;
+    child->parent = parent;
+
+    // Adjust the parent's children array
+    if (parent->children == NULL)
+    {
+        // initial allocation for children array
+        parent->children = (Graph_tree_node**)malloc(1 * sizeof(Graph_tree_node*));
+        if (!parent->children) { printf("[ERROR] add_tree_node: malloc failed\n"); free(child); return NULL; }
+        parent->child_capacity = 1;
+    }
+    else if (parent->num_children + 1 > parent->child_capacity)
+    {
+        // Expansion needed, double the capacity
+        int new_capacity = parent->child_capacity * 2;
+        Graph_tree_node** new_array = (Graph_tree_node**)realloc(parent->children, new_capacity * sizeof(Graph_tree_node*));
+        if (!new_array) { printf("[ERROR] add_tree_node: realloc failed\n"); free(child); return NULL; }
+        parent->children = new_array;
+        parent->child_capacity = new_capacity;
+    }
+    // Add the new child to the parent's children array
+    parent->children[parent->num_children] = child;
+    parent->num_children += 1;
+
+    // Return pointer to the newly created child node
+    return child;
+}
+/*
+   Remove node (and its subtree) identified by vertex.
+   If the removed node is the root, the entire tree is freed and NULL is returned.
+   Otherwise returns the (possibly updated to NULL) tree pointer.
+*/
+static inline Graph_tree* remove_tree_node(Graph_tree* tree, int vertex)
+{
+    // NOTE: After removal, if the parent's children array used < 1/4 of the allocated space, we shrink the allocation
+    // NOTE: we expand previously by 2 and we shrink by 2 (used space ~ 1/2 after shrinking)
+    
+    // ERROR checking: tree should not be NULL, vertex should exist
+    if (!tree) { printf("[ERROR] remove_tree_node: tree is NULL\n"); return NULL; }
+    // ERROR checking: vertex should exist in the tree
+    // We can find the target node by vertex key
+    Graph_tree_node* target = find_tree_node(tree, vertex);
+    if (!target) { printf("[ERROR] remove_tree_node: vertex %d not found\n", vertex); return tree; }
+
+    /* If target is root, free whole tree and return NULL */
+    if (target->parent == NULL)
+    {
+        free_graph_tree(tree);
+        return NULL;
+    }
+
+    // Find the target node and its parent
+    // NOTE: we free everything in the subtree rooted at target,
+    //       and we remove target from its parent's children array
+    Graph_tree_node* parent = target->parent;
+    int idx = -1;
+    for (int i = 0; i < parent->num_children; ++i)
+        if (parent->children[i] == target) { idx = i; break; }
+    if (idx == -1) { printf("[ERROR] remove_tree_node: internal error\n"); return tree; }
+
+    /* Remove from parent's array: swap-with-last then shrink */
+    parent->children[idx] = parent->children[parent->num_children - 1];
+    parent->num_children -= 1;
+    // Check if we should shrink the allocated space
+    // Again, if it's 0, we KEEP it as is, DOES NOT SHRINK to 0
+    if (parent->num_children > 0
+        &&
+        parent->num_children < parent->child_capacity / 4)
+    {
+        // Shrink the capacity by half
+        int new_capacity = parent->child_capacity / 2;
+        Graph_tree_node** new_array = (Graph_tree_node**)realloc(parent->children, new_capacity * sizeof(Graph_tree_node*));
+        if (new_array != NULL)
+        {
+            parent->children = new_array;
+            parent->child_capacity = new_capacity;
+        }
+        else        {
+            // NOTE: if shrinking fails, we can still keep the existing array,
+            //       just with more allocated space than needed, this is not a critical error
+            printf("[ERROR] remove_tree_node: Memory reallocation failed during shrinking\n");
+            // we still can continue
+        }
+    }
+
+    /* Free the removed subtree */
+    free_tree_node_recursively(target);
+
+    // Return the (possibly updated) tree pointer
+    return tree;
+}
+/* Recursively print node with indentation */
+static inline void print_tree_node_recursively(Graph_tree_node* node, int depth)
+{
+    if (!node) return;
+    for (int i = 0; i < depth; ++i) printf("  ");
+    printf("%d\n", node->vertex);
+    for (int i = 0; i < node->num_children; ++i)
+        print_tree_node_recursively(node->children[i], depth + 1);
+}
+/* Print the whole tree (root first) */
+static inline void print_graph_tree(Graph_tree* tree)
+{
+    if (!tree) { printf("[Graph Tree] (null)\n"); return; }
+    printf("Graph Tree (root = %d):\n", tree->root ? tree->root->vertex : -1);
+    if (tree->root) print_tree_node_recursively(tree->root, 0);
+}
 
 #endif // _ALG_GRAPH_ENGINE_H_
