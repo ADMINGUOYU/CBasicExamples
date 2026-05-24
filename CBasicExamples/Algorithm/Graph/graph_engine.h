@@ -1761,5 +1761,151 @@ static inline Graph_tree* dijkstra_sp_list(Graph_list* graph, int start_vertex)
     // return the shortest path tree
     return tree;
 }
+/*
+   Floyd-Warshall all-pairs shortest path matrix on matrix representation
+   Please convert to matrix to proceed, please make sure there's no 0 weight
+   The returned matrix is a V * V matrix,
+   where dist[i][j] is the shortest distance from vertex i to vertex j,
+   we use VALUE_ERROR to represent unreachable in the final int matrix,
+   Remember to free the returned matrix after use
+*/
+static inline int** floydwarshall_sp_matrix(Graph_matrix* graph)
+{
+    // ERROR checking: graph should not be NULL and should have at least 1 vertex
+    if (!graph) { printf("[ERROR] floydwarshall_sp_matrix: graph is NULL\n"); return NULL; }
+    if (graph->V <= 0)
+    {
+        printf("[ERROR] floydwarshall_sp_matrix: graph should have at least 1 vertex\n");
+        return NULL;
+    }
+    if (!graph->matrix)
+    {
+        printf("[ERROR] floydwarshall_sp_matrix: graph->matrix is NULL\n");
+        return NULL;
+    }
+    for (int i = 0; i < graph->V; ++i)
+        if (!graph->matrix[i])
+        {
+            printf("[ERROR] floydwarshall_sp_matrix: graph->matrix[%d] is NULL\n", i);
+            return NULL;
+        }
+
+    // allocate result matrix (V * V)
+    // we use long long for intermediate calculations
+    long long** dist = (long long**)malloc(graph->V * sizeof(long long*));
+    if (!dist)
+    {
+        printf("[ERROR] floydwarshall_sp_matrix: malloc failed for row pointers\n");
+        return NULL;
+    }
+    for (int i = 0; i < graph->V; ++i)
+    {
+        dist[i] = (long long*)malloc(graph->V * sizeof(long long));
+        if (!dist[i])
+        {
+            printf("[ERROR] floydwarshall_sp_matrix: malloc failed for row %d\n", i);
+            for (int r = 0; r < i; ++r) free(dist[r]);
+            free(dist);
+            return NULL;
+        }
+    }
+    // allocate a final int matrix to return, we will convert long long dist back to int at the end
+    int** final_dist = (int**)malloc(graph->V * sizeof(int*));
+    if (!final_dist)    {
+        printf("[ERROR] floydwarshall_sp_matrix: malloc failed for final_dist row pointers\n");
+        for (int r = 0; r < graph->V; ++r) free(dist[r]);
+        free(dist);
+        return NULL;
+    }
+    for (int i = 0; i < graph->V; ++i)
+    {
+        final_dist[i] = (int*)malloc(graph->V * sizeof(int));
+        if (!final_dist[i])        {
+            printf("[ERROR] floydwarshall_sp_matrix: malloc failed for final_dist row %d\n", i);
+            for (int r = 0; r < graph->V; ++r) free(dist[r]);
+            free(dist);
+            for (int r = 0; r < i; ++r) free(final_dist[r]);
+            free(final_dist);
+            return NULL;
+        }
+    }
+
+    // A large value to represent infinity
+    long long inf = LLONG_MAX / 4;
+
+    // initialize distance matrix from adjacency matrix
+    // NOTE:
+    //   - dist[i][i] = 0 (distance to itself)
+    //   - graph->matrix[i][j] != 0 means there is a directed edge i -> j
+    //   - graph->matrix[i][j] == 0 means no edge, set to "infinity"
+    for (int i = 0; i < graph->V; ++i)
+        for (int j = 0; j < graph->V; ++j)
+        {
+            // if i == j, distance to itself is 0
+            if (i == j) dist[i][j] = 0LL;
+            // if there's an edge, assign the direct edge weight
+            else if (graph->matrix[i][j] != 0)
+                // assign direct edge weight
+                dist[i][j] = (long long)graph->matrix[i][j];
+            else dist[i][j] = inf;
+        }
+
+    // Floyd-Warshall core:
+    // we try each vertex k as an intermediate vertex and relax all pairs (i, j)
+    for (int k = 0; k < graph->V; ++k)
+    {
+        // relax all pairs (i, j) through intermediate vertex k
+        for (int i = 0; i < graph->V; ++i)
+            for (int j = 0; j < graph->V; ++j)
+            {
+                // if either side is "infinity", path i -> k -> j is not valid
+                if (dist[i][k] == inf || dist[k][j] == inf) continue;
+                // candidate path through k
+                long long candidate = dist[i][k] + dist[k][j];
+                // relax if better
+                if (candidate < dist[i][j])
+                    dist[i][j] = candidate;
+            }
+
+        // negative cycle detection:
+        // if any dist[i][i] < 0 after processing intermediate vertex set {0..k},
+        // then a negative cycle exists
+        for (int i = 0; i < graph->V; ++i)
+            if (dist[i][i] < 0)
+            {
+                printf("[ERROR] floydwarshall_sp_matrix: negative-weight cycle detected\n");
+                for (int r = 0; r < graph->V; ++r) free(dist[r]);
+                free(dist);
+                for (int r = 0; r < graph->V; ++r) free(final_dist[r]);
+                free(final_dist);
+                return NULL;
+            }
+    }
+
+    // convert long long dist back to int in final_dist,
+    // with sanity check for overflow
+    for (int i = 0; i < graph->V; ++i)
+        for (int j = 0; j < graph->V; ++j)
+        {
+            if (dist[i][j] == inf) final_dist[i][j] = VALUE_ERROR;
+            else if (dist[i][j] > INT_MAX || dist[i][j] <= VALUE_ERROR)
+            {
+                printf("[ERROR] floydwarshall_sp_matrix: distance from %d to %d exceeds int range\n", i, j);
+                for (int r = 0; r < graph->V; ++r) free(dist[r]);
+                free(dist);
+                for (int r = 0; r < graph->V; ++r) free(final_dist[r]);
+                free(final_dist);
+                return NULL;
+            }
+            else final_dist[i][j] = (int)dist[i][j];
+        }
+    
+    // free intermediate long long dist matrix
+    for (int i = 0; i < graph->V; ++i) free(dist[i]);
+    free(dist);
+
+    // return the all-pairs shortest path matrix
+    return final_dist;
+}
 
 #endif // _ALG_GRAPH_ENGINE_H_

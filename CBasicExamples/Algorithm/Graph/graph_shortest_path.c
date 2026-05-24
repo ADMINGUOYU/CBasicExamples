@@ -271,6 +271,11 @@ int alg_graph_shortest_path_main(int argc, char* argv[])
         dijkstra_dist[v] = collect_root_to_node_weight_list(dijkstra_tree, graph, v);
     }
 
+    // Convert a matrix version of the graph for Floyd-Warshall
+    Graph_matrix* graph_matrix = list_to_matrix(graph);
+    // Run Floyd-Warshall for all-pairs shortest path matrix
+    int ** floydwarshall_dist = floydwarshall_sp_matrix(graph_matrix);
+
     // Print results
     printf("\033[1;32m>>> Graph Shortest Path (Results) >>>\033[0m\n");
     printf("  ├── \033[1mBellman-Ford Distances:\033[0m ");
@@ -289,6 +294,23 @@ int alg_graph_shortest_path_main(int argc, char* argv[])
     print_graph_tree(bellmanford_tree);
     printf("\033[1;34mDijkstra Shortest Path Tree:\033[0m\n");
     print_graph_tree(dijkstra_tree);
+    // Print Floyd-Warshall results
+    printf("\033[1;34mFloyd-Warshall All-Pairs Shortest Path Matrix:\033[0m\n");
+    // print header
+    printf("FROM\\TO");
+    for (int i = 0; i < num_vertices; ++i)
+        printf("%2c\033[1m%2d\033[0m", ' ', i);
+    printf("\n");
+    for (int i = 0; i < num_vertices; ++i)
+    {
+        printf("%3c\033[1m%2d\033[0m%2c", ' ', i, ' ');
+        for (int j = 0; j < num_vertices; ++j)
+        {
+            if (floydwarshall_dist[i][j] == VALUE_ERROR) printf("%c%3s", ' ', "INF");
+            else printf("%c%3d", ' ', floydwarshall_dist[i][j]);
+        }
+        printf("\n");
+    }
 
     // Free allocated memory
     free(bellmanford_dist);
@@ -296,6 +318,9 @@ int alg_graph_shortest_path_main(int argc, char* argv[])
     free_graph_tree(bellmanford_tree);
     free_graph_tree(dijkstra_tree);
     free_graph_list(graph);
+    free_graph_matrix(graph_matrix);
+    for (int i = 0; i < num_vertices; ++i) free(floydwarshall_dist[i]);
+    free(floydwarshall_dist);
 
     return 0;
 }
