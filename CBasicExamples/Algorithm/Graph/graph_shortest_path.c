@@ -237,5 +237,65 @@ C) Solution 3: Floyd-Warshall
 // Entry point
 int alg_graph_shortest_path_main(int argc, char* argv[])
 {
+    // Set up a simple undirected graph (in adjacency list representation)
+    int num_vertices = 8;
+    Graph_list* graph = create_graph_list(num_vertices);
+    add_edge_list(graph, 0, 1, 9);
+    add_edge_list(graph, 0, 5, 14);
+    add_edge_list(graph, 0, 6, 20);
+    add_edge_list(graph, 1, 2, 23);
+    add_edge_list(graph, 2, 4, 2);
+    add_edge_list(graph, 2, 7, 19);
+    add_edge_list(graph, 3, 2, 6);
+    add_edge_list(graph, 3, 7, 6);
+    add_edge_list(graph, 4, 3, 11);
+    add_edge_list(graph, 4, 7, 16);
+    add_edge_list(graph, 5, 2, 18);
+    add_edge_list(graph, 5, 4, 31);
+    add_edge_list(graph, 5, 6, 5);
+    add_edge_list(graph, 6, 4, 20);
+    add_edge_list(graph, 6, 7, 44);
+
+    // Find shortest path using Bellman-Ford and Dijkstra's algorithms
+    Graph_tree* bellmanford_tree = bellmanford_sp_list(graph, 0);
+    Graph_tree* dijkstra_tree = dijkstra_sp_list(graph, 0);
+
+    // Allocate buffers to store distance to every node for both algorithms
+    int* bellmanford_dist = (int*)malloc(sizeof(int) * num_vertices);
+    int* dijkstra_dist = (int*)malloc(sizeof(int) * num_vertices);
+
+    // Get the distance to every node from the shortest path trees
+    for (int v = 0; v < num_vertices; ++v)
+    {
+        bellmanford_dist[v] = collect_root_to_node_weight_list(bellmanford_tree, graph, v);
+        dijkstra_dist[v] = collect_root_to_node_weight_list(dijkstra_tree, graph, v);
+    }
+
+    // Print results
+    printf("\033[1;32m>>> Graph Shortest Path (Results) >>>\033[0m\n");
+    printf("  ├── \033[1mBellman-Ford Distances:\033[0m ");
+    for (int v = 0; v < num_vertices; ++v)
+        printf("%d ", bellmanford_dist[v]);
+    printf("\n");
+    printf("  └── \033[1mDijkstra Distances    :\033[0m ");
+    for (int v = 0; v < num_vertices; ++v)
+        printf("%d ", dijkstra_dist[v]);
+    printf("\n");
+    // Print original graph
+    printf("\033[1;34mOriginal Graph (Adjacency List):\033[0m\n");
+    print_graph_list(graph);
+    // Print the shortest path trees
+    printf("\033[1;34mBellman-Ford Shortest Path Tree:\033[0m\n");
+    print_graph_tree(bellmanford_tree);
+    printf("\033[1;34mDijkstra Shortest Path Tree:\033[0m\n");
+    print_graph_tree(dijkstra_tree);
+
+    // Free allocated memory
+    free(bellmanford_dist);
+    free(dijkstra_dist);
+    free_graph_tree(bellmanford_tree);
+    free_graph_tree(dijkstra_tree);
+    free_graph_list(graph);
+
     return 0;
 }

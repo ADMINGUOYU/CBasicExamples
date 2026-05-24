@@ -762,6 +762,35 @@ static inline int collect_total_edge_weight_list(Graph_tree* tree, Graph_list* g
     // return the total weight
     return total;
 }
+/* Recursively Collect weight from root to a node - operates on list representation */
+static inline int collect_root_to_node_weight_recursively_list(Graph_tree_node* node, Graph_list* graph)
+{
+    // base case - if node is NULL, return 0
+    if (!node) return 0;
+    // if node is root (parent points to itself), return 0
+    if (node->parent == node) return 0;
+    // get the edge weight from node to its parent (start from parent and TO this node)
+    int weight = get_edge_weight_list(graph, node->parent->vertex, node->vertex);
+    // check if the returned value is VALUE_ERROR
+    if (weight == VALUE_ERROR)
+        // if we get VALUE_ERROR, either is an error or if the weight is actually VALUE_ERROR, we only prompt user the warning
+        printf("[WARNING] collect_root_to_node_weight_recursively_list: edge from %d to %d is reported to have weight VALUE_ERROR(%d), please inspect if there's a earlier error printout.\n", node->parent->vertex, node->vertex, weight);
+    // recursively collect weight from root to parent and add the weight from parent to node
+    return collect_root_to_node_weight_recursively_list(node->parent, graph) + weight;
+}
+/* Collect weight from root to a node - operates on list representation */
+static inline int collect_root_to_node_weight_list(Graph_tree* tree, Graph_list* graph, int vertex)
+{
+    // if tree is NULL, just return 0
+    if (!tree) return 0;
+    // find the target node by vertex key
+    Graph_tree_node* target = find_tree_node(tree, vertex);
+    if (!target) { printf("[ERROR] collect_root_to_node_weight_list: vertex %d not found in the tree\n", vertex); return VALUE_ERROR; }
+    // collect weight from root to the target node
+    int total = collect_root_to_node_weight_recursively_list(target, graph);
+    // return the total weight
+    return total;
+}
 /* Print the whole tree (root first) */
 static inline void print_graph_tree(Graph_tree* tree)
 {
@@ -1372,6 +1401,364 @@ static inline Graph_tree* kruskal_mst_list(Graph_list* graph, int start_vertex)
     free(edges);
 
     // return the MST tree
+    return tree;
+}
+
+// =================================================
+// Shortest path algorithms
+// =================================================
+/* Bellman-Ford shortest path tree on list representation */
+static inline Graph_tree* bellmanford_sp_list(Graph_list* graph, int start_vertex)
+{
+    // ERROR checking: graph should not be NULL and should have at least 1 vertex
+    if (!graph) { printf("[ERROR] bellmanford_sp_list: graph is NULL\n"); return NULL; }
+    if (graph->V <= 0)
+    {
+        printf("[ERROR] bellmanford_sp_list: graph should have at least 1 vertex\n");
+        return NULL;
+    }
+    if (start_vertex < 0 || start_vertex >= graph->V)
+    {
+        printf("[ERROR] bellmanford_sp_list: start_vertex should be within [0, %d)\n", graph->V);
+        return NULL;
+    }
+
+    // create shortest path tree with the specified start vertex as root
+    Graph_tree* tree = create_graph_tree(start_vertex);
+    if (!tree) return NULL;
+
+    // A large value to represent infinity,
+    // we use LLONG_MAX/4 to avoid potential overflow when adding edge weights
+    // as we might have INF + INF, though it's not valid and smaller than INF originally
+    long long inf = LLONG_MAX / 4;
+
+    // allocate Bellman-Ford arrays
+    // This array stores the shortest distance from start_vertex to each vertex, init to "infinity"
+    long long* dist = (long long*)malloc(graph->V * sizeof(long long));
+    // This parent array is used to reconstruct the shortest path tree, parent[i] is the parent of
+    // vertex i in the shortest path tree, init to NOT_FOUND_ERROR (indicating no parent)
+    int* parent = (int*)malloc(graph->V * sizeof(int));
+    if (!dist || !parent)
+    {
+        printf("[ERROR] bellmanford_sp_list: malloc failed\n");
+        if (dist) free(dist);
+        if (parent) free(parent);
+        free_graph_tree(tree);
+        return NULL;
+    }
+    for (int i = 0; i < graph->V; ++i)
+    {
+        dist[i] = inf;  // init all distances to "infinity"
+        parent[i] = NOT_FOUND_ERROR; // init all parents to NOT_FOUND_ERROR (indicating no parent)
+    }
+
+    // distance to the start vertex is 0, and we can consider it as its own parent in the tree
+    dist[start_vertex] = 0;
+    parent[start_vertex] = start_vertex;
+
+    // relax all edges at most V - 1 times (as a tree, at most V - 1 edges)
+    for (int it = 0; it < graph->V - 1; ++it)
+    {
+        // we use a flag to check if any distance was updated in this iteration
+        int changed = 0;
+
+        // loop through all edges and relax them
+        for (int u = 0; u < graph->V; ++u)
+            // if the distance to u is not infinity, we can try to relax edges out of u
+            // NOTE: if the parent is INF (not connected), we don't expect
+            //       we're able to relax it.
+            if (dist[u] != inf && graph->adjList[u] != NULL)
+                // loop through all edges out of u and try to relax them
+                for (int j = 0; j < graph->adjSize[u]; ++j)
+                {
+                    // destination vertex v
+                    int v = graph->adjList[u][j][0];
+                    // weight of edge (u, v)
+                    int w = graph->adjList[u][j][1];
+                    // calculate new candidate distance to v through u
+                    long long candidate = dist[u] + (long long)w;
+                    // if through u is shorter, update distance and parent for v
+                    if (candidate < dist[v])
+                    {
+                        dist[v] = candidate;
+                        parent[v] = u;
+                        // we mark that we updated something in this iteration
+                        changed = 1;
+                    }
+                }
+        // if no distance was updated in this iteration, we can stop early
+        if (!changed) break;
+    }
+
+    // detect negative-weight cycle reachable from start_vertex
+    // We run relaxation one more time
+    for (int u = 0; u < graph->V; ++u)
+        if (dist[u] != inf && graph->adjList[u] != NULL)
+            for (int j = 0; j < graph->adjSize[u]; ++j)
+            {
+                int v = graph->adjList[u][j][0];
+                int w = graph->adjList[u][j][1];
+                // if we can still relax, that means we have a negative-weight cycle
+                if (dist[u] + (long long)w < dist[v])
+                {
+                    printf("[ERROR] bellmanford_sp_list: negative-weight cycle detected from start vertex %d\n", start_vertex);
+                    free(dist);
+                    free(parent);
+                    free_graph_tree(tree);
+                    return NULL;
+                }
+            }
+
+    // build rooted shortest path tree from parent array
+    int* in_tree = (int*)calloc(graph->V, sizeof(int));
+    if (!in_tree)
+    {
+        printf("[ERROR] bellmanford_sp_list: calloc failed for in_tree array\n");
+        free(dist);
+        free(parent);
+        free_graph_tree(tree);
+        return NULL;
+    }
+
+    // mark the start vertex as in the tree
+    in_tree[start_vertex] = 1;
+
+    // we count the number of reachable vertices
+    // (in case the graph is disconnected)
+    int reachable_count = 0;
+    for (int i = 0; i < graph->V; ++i)
+        if (dist[i] != inf) reachable_count += 1;
+
+    // log attached edges
+    int attached_edges = 0;
+    // flag to check if we attached something
+    int progress = 1;
+    // loop until we cannot attach any more
+    while (progress)
+    {
+        progress = 0;
+        // loop through all vertices and try to attach them to the tree
+        for (int v = 0; v < graph->V; ++v)
+        {
+            // skip starting vertex, unreachable vertices, and already attached vertices
+            if (v == start_vertex || dist[v] == inf || in_tree[v]) continue;
+            // look for it's parent
+            int p = parent[v];
+            // parent should not be NOT_FOUND_ERROR and should be already in the tree,
+            // then we can attach v to the tree
+            // NOTE: if dist[v] != inf it should have a valid parent, checking just in case.
+            if (p != NOT_FOUND_ERROR && in_tree[p])
+            {
+                // add v to the tree as a child of p
+                if (!add_tree_node(tree, p, v))
+                {
+                    free(in_tree);
+                    free(dist);
+                    free(parent);
+                    free_graph_tree(tree);
+                    return NULL;
+                }
+                // mark v in tree too
+                in_tree[v] = 1;
+                // log that we attached one more edge
+                attached_edges += 1;
+                // set flag
+                progress = 1;
+            }
+        }
+    }
+
+    // sanity check: we should have attached exactly reachable_count - 1 edges
+    // if the tree is correctly built
+    if (attached_edges != reachable_count - 1)
+        printf("[WARNING] bellmanford_sp_list: could not attach all reachable vertices into shortest path tree from root %d\n", start_vertex);
+
+    // cleanup and return
+    free(in_tree);
+    free(dist);
+    free(parent);
+
+    // return the shortest path tree
+    return tree;
+}
+/* Dijkstra shortest path tree on list representation */
+static inline Graph_tree* dijkstra_sp_list(Graph_list* graph, int start_vertex)
+{
+    // ERROR checking: graph should not be NULL and should have at least 1 vertex
+    if (!graph) { printf("[ERROR] dijkstra_sp_list: graph is NULL\n"); return NULL; }
+    if (graph->V <= 0)
+    {
+        printf("[ERROR] dijkstra_sp_list: graph should have at least 1 vertex\n");
+        return NULL;
+    }
+    if (start_vertex < 0 || start_vertex >= graph->V)
+    {
+        printf("[ERROR] dijkstra_sp_list: start_vertex should be within [0, %d)\n", graph->V);
+        return NULL;
+    }
+
+    // NOTE: Dijkstra requires non-negative edge weights
+    // loop all edges to check for negative weights, if found, we print error and return NULL
+    for (int u = 0; u < graph->V; ++u)
+        if (graph->adjList[u] != NULL)
+            for (int j = 0; j < graph->adjSize[u]; ++j)
+                if (graph->adjList[u][j][1] < 0)
+                {
+                    printf("[ERROR] dijkstra_sp_list: negative edge weight detected (%d -> %d, w=%d)\n",
+                        u, graph->adjList[u][j][0], graph->adjList[u][j][1]);
+                    printf("[NOTE] dijkstra_sp_list: consider using Bellman-Ford for graphs with negative edge weights\n");
+                    return NULL;
+                }
+
+    // create shortest path tree with the specified start vertex as root
+    Graph_tree* tree = create_graph_tree(start_vertex);
+    if (!tree) return NULL;
+
+    // A large value to represent infinity,
+    // we use LLONG_MAX/4 to avoid potential overflow when adding edge weights
+    // as we might have INF + INF, though it's not valid and smaller than INF originally
+    long long inf = LLONG_MAX / 4;
+
+    // allocate Dijkstra arrays
+    // dist array stores the shortest distance from start_vertex to each vertex, init to "infinity"
+    long long* dist = (long long*)malloc(graph->V * sizeof(long long));
+    // parent array is used to reconstruct the shortest path tree, parent[i] is the parent of
+    // vertex i in the shortest path tree, init to NOT_FOUND_ERROR (indicating no parent)
+    int* parent = (int*)malloc(graph->V * sizeof(int));
+    // settled array tracks whether a vertex's shortest distance is finalized (settled),
+    // init to 0 (not settled)
+    // settled means that node is connected and fully explored
+    int* settled = (int*)calloc(graph->V, sizeof(int));
+    if (!dist || !parent || !settled)
+    {
+        printf("[ERROR] dijkstra_sp_list: malloc/calloc failed\n");
+        if (dist) free(dist);
+        if (parent) free(parent);
+        if (settled) free(settled);
+        free_graph_tree(tree);
+        return NULL;
+    }
+
+    // initialize dist and parent arrays
+    for (int i = 0; i < graph->V; ++i)
+    {
+        dist[i] = inf;
+        parent[i] = NOT_FOUND_ERROR;
+    }
+
+    // distance to the start vertex is 0, and we can consider it as its own parent in the tree
+    dist[start_vertex] = 0;
+    parent[start_vertex] = start_vertex;
+
+    // O(V^2 + E) Dijkstra using linear extract-min over unsettled vertices
+    // loop V times to settle at most V vertices (in a tree, at most V - 1 edges)
+    for (int it = 0; it < graph->V; ++it)
+    {
+        int u = NOT_FOUND_ERROR;
+
+        // find the unsettled vertex with the smallest distance
+        // loop the dist array to find the next vertex to settle
+        // NOTE: at this time, its parent has already been set
+        // NOTE: the first run will settle start_vertex
+        for (int i = 0; i < graph->V; ++i)
+            if (!settled[i] && (u == NOT_FOUND_ERROR || dist[i] < dist[u]))
+                u = i;
+
+        // remaining vertices are unreachable
+        if (u == NOT_FOUND_ERROR || dist[u] == inf) break;
+
+        // mark u as settled (we connect u to the connected set S)
+        settled[u] = 1;
+
+        // relax all outgoing edges from u, as now u is in S
+        if (graph->adjList[u] != NULL)
+            // loop all it's outgoing edges
+            for (int j = 0; j < graph->adjSize[u]; ++j)
+            {
+                // get destination vertex v and weight w of edge (u, v)
+                int v = graph->adjList[u][j][0];
+                int w = graph->adjList[u][j][1];
+                // calculate start_vertex -> ... -> u -> v as a candidate path to v
+                long long candidate = dist[u] + (long long)w;
+                // if smaller, relax v and update parent for v
+                if (!settled[v] && candidate < dist[v])
+                {
+                    dist[v] = candidate;
+                    parent[v] = u;
+                }
+            }
+    }
+
+    // build rooted shortest path tree from parent array
+    int* in_tree = (int*)calloc(graph->V, sizeof(int));
+    if (!in_tree)
+    {
+        printf("[ERROR] dijkstra_sp_list: calloc failed for in_tree array\n");
+        free(dist);
+        free(parent);
+        free(settled);
+        free_graph_tree(tree);
+        return NULL;
+    }
+
+    // mark the start vertex as in the tree
+    in_tree[start_vertex] = 1;
+
+    // we count the number of reachable vertices (in case the graph is disconnected)
+    int reachable_count = 0;
+    for (int i = 0; i < graph->V; ++i)
+        if (dist[i] != inf) reachable_count += 1;
+
+    // log attached edges
+    int attached_edges = 0;
+    // flag to check if we attached something
+    int progress = 1;
+    // loop until we cannot attach any more
+    while (progress)
+    {
+        progress = 0;
+        // loop through all vertices and try to attach them to the tree
+        for (int v = 0; v < graph->V; ++v)
+        {
+            // skip starting vertex, unreachable vertices, and already attached vertices
+            if (v == start_vertex || dist[v] == inf || in_tree[v]) continue;
+            // look for it's parent, if parent is valid and already in the tree,
+            // we can attach v to the tree
+            int p = parent[v];
+            // NOTE: if dist[v] != inf, it should have a valid parent, we check just in case.
+            if (p != NOT_FOUND_ERROR && in_tree[p])
+            {
+                // add v to the tree as a child of p
+                if (!add_tree_node(tree, p, v))
+                {
+                    free(in_tree);
+                    free(dist);
+                    free(parent);
+                    free(settled);
+                    free_graph_tree(tree);
+                    return NULL;
+                }
+                // mark v in tree too
+                in_tree[v] = 1;
+                attached_edges += 1;
+                // we mark that we added something
+                progress = 1;
+            }
+        }
+    }
+
+    // sanity check: we should have attached exactly reachable_count - 1 edges if
+    // the tree is correctly built
+    if (attached_edges != reachable_count - 1)
+        printf("[WARNING] dijkstra_sp_list: could not attach all reachable vertices into shortest path tree from root %d\n", start_vertex);
+
+    // cleanup and return
+    free(in_tree);
+    free(dist);
+    free(parent);
+    free(settled);
+
+    // return the shortest path tree
     return tree;
 }
 
