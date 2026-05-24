@@ -1,11 +1,8 @@
 CC = gcc
 CFLAGS = -std=c99 -g -Wall
 SRCDIR = ./CBasicExamples
-# Collect all .c files in the source directory and its subdirectories
-SRCS = main.c $(wildcard $(SRCDIR)/*.c)
-# Add source files from subdirectories
-SRCS += $(wildcard $(SRCDIR)/*/*.c)
-SRCS += $(wildcard $(SRCDIR)/*/*/*.c)
+# Collect all .c files recursively (including main.c)
+SRCS := main.c $(shell find $(SRCDIR) -type f -name '*.c' | sort)
 # Generate object files and dependency files from source files
 OBJS = $(SRCS:.c=.o)
 # Generate dependency files from source files
