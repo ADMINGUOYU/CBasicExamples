@@ -13,6 +13,7 @@
 8  : enumeration
 9  : large number(uint) multiplication
 10 : array demonstration
+
 11 : Algorithm: Dynamic Programming - Rod Cutting Problem
 12 : Algorithm: Dynamic Programming - Minimum Number of Coins
 13 : Algorithm: Dynamic Programming - Weighted Interval Scheduling
@@ -26,8 +27,12 @@
 21 : Algorithm: Dynamic Programming - [2D] Edit Distance
 22 : Algorithm: Dynamic Programming - [2D] Egg Dropping Problem
 23 : Algorithm: Dynamic Programming - [INTERVAL] Longest Palindromic Substring
+
 24 : Algorithm: Greedy - Huffman Coding
 25 : Algorithm: Greedy - WiFi Tower Placement
+
 26 : Algorithm: Graph - Adjacency Matrix/List Representation
 27 : Algorithm: Graph - Traversal (BFS and DFS)
+28 : Algorithm: Graph - Minimum Spanning Tree (MST)
+29 : Algorithm: Graph - Shortest Path
 ```
